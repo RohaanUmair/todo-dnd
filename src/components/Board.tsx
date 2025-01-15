@@ -115,21 +115,30 @@ function Board() {
     const deleteTask = (taskId: number) => {
         setTasks(tasks.filter((task) => task.id !== taskId));
 
-        const notify = () => toast.success('Task Deleted!');
+        const notify = () => toast.success('Task Deleted!', {
+            duration: 1000,
+            position: 'top-right',
+        });
         notify();
     };
 
     const deleteAllItems = (colId: number) => {
         setTasks(tasks.filter((task) => task.colId !== colId));
 
-        const notify = () => toast.success('Deleted!');
+        const notify = () => toast.success('Deleted!', {
+            duration: 1000,
+            position: 'top-right',
+        });
         notify();
     };
 
     const deleteCol = (colTitle: string) => {
         setCols(cols.filter((col) => col.title !== colTitle));
 
-        const notify = () => toast.success('Deleted!');
+        const notify = () => toast.success('Deleted!', {
+            duration: 1000,
+            position: 'top-right',
+        });
         notify();
     };
 
@@ -141,7 +150,10 @@ function Board() {
         if (!heading) return;
 
         if (cols.find((col) => col.title === heading)) {
-            const notify = () => toast.error('Column with this title already exists!');
+            const notify = () => toast.error('Column with this title already exists!',  {
+                duration: 1000,
+                position: 'top-right',
+            });
             notify();
 
             setHeading('');
@@ -156,21 +168,30 @@ function Board() {
     const editColTitle = (colId: number, newTitle: string) => {
         const checkUnique = cols.find((col) => col.title == newTitle);
         if (checkUnique) {
-            const notify = () => toast.error('Column with this title already exists!');
+            const notify = () => toast.error('Column with this title already exists!',  {
+                duration: 1000,
+                position: 'top-right',
+            });
             notify();
             return;
         }
 
         setCols(cols.map((col) => col.id === colId ? { ...col, title: newTitle } : col));
 
-        const notify = () => toast.success('Updated!');
+        const notify = () => toast.success('Updated!',  {
+            duration: 1000,
+            position: 'top-right',
+        });
         notify();
     };
 
     const editTask = (taskId: number, newText: string) => {
         setTasks(tasks.map((task) => task.id === taskId ? { ...task, text: newText } : task));
 
-        const notify = () => toast.success('Updated!');
+        const notify = () => toast.success('Updated!',  {
+            duration: 1000,
+            position: 'top-right',
+        });
         notify();
     }
 
