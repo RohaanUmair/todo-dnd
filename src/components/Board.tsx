@@ -114,6 +114,9 @@ function Board() {
 
     const deleteTask = (taskId: number) => {
         setTasks(tasks.filter((task) => task.id !== taskId));
+
+        const notify = () => toast.success('Task Deleted!');
+        notify();
     };
 
     const deleteAllItems = (colId: number) => {

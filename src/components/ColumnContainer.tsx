@@ -99,7 +99,7 @@ function ColumnContainer(props: any) {
                                 </div>
                             </form>
                         ) : (
-                            <h3 className="text-white text-sm">{props.col.title}</h3>
+                            <h3 className="text-white text-sm text-wrap truncate">{props.col.title}</h3>
                         )
                     }
                     <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
