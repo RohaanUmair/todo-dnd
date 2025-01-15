@@ -3,13 +3,13 @@ import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import React, { useEffect, useState } from 'react'
 import { CSS } from '@dnd-kit/utilities';
 import { IoClose } from 'react-icons/io5';
-import { MdAddCircleOutline, MdDeleteForever, MdDeleteSweep } from 'react-icons/md';
+import { MdAddCircleOutline, MdDeleteForever, MdDeleteSweep, MdEdit } from 'react-icons/md';
 import { TbDots } from 'react-icons/tb';
 import Task from './Task';
-import { RiDragDropLine } from 'react-icons/ri';
+import { TiTick } from 'react-icons/ti';
 
-function ColumnContainer(props) {
-    const { setNodeRef, attributes, listeners, transform, transition } = useSortable({
+function ColumnContainer(props: any) {
+    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: props.col.id,
         data: {
             type: 'Column',
@@ -21,6 +21,7 @@ function ColumnContainer(props) {
         transform: CSS.Transform.toString(transform),
         transition,
     };
+
 
     const [openMenu, setOpenMenu] = useState<boolean>(false);
 
@@ -35,73 +36,132 @@ function ColumnContainer(props) {
     }, [props.tasks]);
 
 
+    const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
+    const [newTitle, setNewTitle] = useState<string>(props.col.title);
+
+    const handleEditColTitle = () => {
+        if (newTitle.trim() === props.col.title) {
+            setIsEditingTitle(false);
+            return;
+        }
+        
+        if (newTitle.trim() === '') {
+            setNewTitle(props.col.title);
+        } else {
+            props.editColTitle(props.col.id, newTitle);
+        }
+        setIsEditingTitle(false);
+    }
+
+
+    if (isDragging) {
+        return (
+            <div
+                className={`w-60 border-rose-600 border-dashed border-2 rounded pb-5 h-[350px] relative`}
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+            >
+            </div>
+        )
+    }
+
 
     return (
         <>
             <div
-                className={`w-72 bg-slate-100 rounded-xl pb-5 h-[400px] relative`}
+                className={`w-60 bg-zinc-800 rounded pb-5 h-[350px] border border-zinc-950`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
             >
                 <div
                     {...listeners}
-                    className="flex justify-between px-4 items-center py-3 border-b mb-5 bg-slate-100 w-72 absolute rounded-t-xl"
+                    className="flex justify-between px-4 items-center py-3 border-b border-black bg-zinc-800 w-full rounded-t cursor-grab"
                 >
-                    <h3 className="text-gray-700 font-bold">{props.col.title}</h3>
-                    <div className={`w-6 h-6 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-gray-300' : ''}`} onClick={() => setOpenMenu(!openMenu)}>
+                    {
+                        isEditingTitle ? (
+                            <form onSubmit={handleEditColTitle} className='flex items-center'>
+                                <input
+                                    type="text"
+                                    placeholder="Column Title"
+                                    className="rounded-t outline-none bg-zinc-800 w-36 text-white text-sm"
+                                    value={newTitle}
+                                    onChange={(e) => setNewTitle(e.target.value)}
+                                    onBlur={handleEditColTitle}
+                                    autoFocus
+                                />
+
+                                <div
+                                    className="h-6 w-6 bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer"
+                                >
+                                    <TiTick />
+                                </div>
+                            </form>
+                        ) : (
+                            <h3 className="text-white text-sm">{props.col.title}</h3>
+                        )
+                    }
+                    <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
                         {
                             openMenu ? (
                                 <>
                                     <IoClose className="text-lg" />
                                     <div className="relative">
-                                        <ul className="absolute !w-36 top-4 text-sm right-0 font-semibold bg-white shadow-2xl rounded-lg p-2">
+                                        <ul className="absolute !w-36 top-4 text-sm right-0 bg-zinc-900 border rounded text-white p-2">
                                             <li
-                                                className="cursor-pointer hover:bg-gray-200 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
-                                            // onClick={() => deleteAllItems()}
+                                                className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
+                                                onClick={() => setIsEditingTitle(true)}
+                                            >
+                                                Edit <MdEdit className="text-xl text-yellow-400" />
+                                            </li>
+
+                                            <li
+                                                className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
+                                                onClick={() => props.deleteAllItems(props.col.id)}
                                             >
                                                 Delete All <MdDeleteSweep className="text-xl text-red-600" />
                                             </li>
-                                            {
-                                                props.col.id > 2 && (
-                                                    <li
-                                                        className="cursor-pointer hover:bg-gray-200 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1"
-                                                    // onClick={deleteCard}
-                                                    >
-                                                        Delete Card <MdDeleteForever className="text-xl text-red-800" />
-                                                    </li>
-                                                )
-                                            }
+
+                                            <li
+                                                className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1"
+                                                onClick={() => props.deleteCol(props.col.title)}
+                                            >
+                                                Delete Column <MdDeleteForever className="text-xl text-red-800" />
+                                            </li>
                                         </ul>
                                     </div>
                                 </>
                             ) : (
-                                <TbDots className="text-lg" />
+                                <TbDots className="text-lg text-white" />
                             )
                         }
                     </div>
                 </div>
 
-                <div className={`mt-[50px] pt-[49px] h-[300px] overflow-x-hidden ${isScrollable ? 'overflow-y-scroll' : ''}`}>
+                <div className={`h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
                     <SortableContext items={props.tasks.map((task) => task.id)}>
-                        {
-                            props.tasks.map((task: any, index: number) => {
-                                return (
-                                    <Task key={index} task={task} />
-                                )
-                            })
-                        }
+                        {props.tasks.length > 0 ? (
+                            props.tasks.map((task: any, index: number) => (
+                                <Task updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
+                            ))
+                        ) : (
+                            <div
+                                className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6"
+                            >
+                                Drag a task here or create a new one
+                            </div>
+                        )}
                     </SortableContext>
                 </div>
 
-                <div className="flex justify-center mt-5">
+                <div className="flex justify-center mt-4">
                     <div
                         onClick={() => props.addNewTask(props.col.id)}
-                        className="w-[80%] mx-auto h-10 border-dashed border-2 border-gray-300  rounded flex items-center px-4 hover:bg-zinc-300 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
+                        className="w-[80%] mx-auto h-10 border-dashed border-2 border-zinc-500  rounded flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
                     >
                         <h1 className=" font-bold flex items-center justify-between w-full">
-                            <span className="flex items-center gap-2">Add <MdAddCircleOutline /></span>
-                            {/* <span className="flex items-center gap-2 text-[15px]">or Drag Here<RiDragDropLine /></span> */}
+                            <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
                         </h1>
                     </div>
                 </div>

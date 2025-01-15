@@ -1,15 +1,16 @@
-import React from 'react';
-import { MdDeleteForever } from 'react-icons/md';
-import { TiTick } from 'react-icons/ti';
+'use client';
+import React, { useState } from 'react';
+import { MdDeleteForever, MdEdit } from 'react-icons/md';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { TiTick } from 'react-icons/ti';
 
-function Task(props) {
-    const { setNodeRef, attributes, listeners, transform, transition } = useSortable({
+function Task(props: any) {
+    const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: props.task.id,
         data: {
             type: 'Task',
-            column: props.task,
+            task: props.task,
         }
     });
 
@@ -19,26 +20,107 @@ function Task(props) {
     };
 
 
+    // const [isEditingTask, setIsEditingTask] = useState<boolean>(false);
+    // const [newTask, setNewTask] = useState<string>(props.task.text);
+
+
+    const [editMode, setEditMode] = useState<boolean>(false);
+
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
+    };
+
+
+    // const handleEditTask = () => {
+    //     if (newTask.trim() === '') {
+    //         setNewTask(props.task.text);
+    //     } else {
+    //         props.editTask(props.task.id, newTask);
+    //     }
+    //     setIsEditingTask(false);
+    // }
+
+
+    if (editMode) {
+        return (
+            <>
+                <form
+                    className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        toggleEditMode();
+                    }}
+                >
+                    <input
+                        type="text"
+                        placeholder='Task'
+                        className="outline-none w-32 bg-zinc-900 text-sm text-white"
+                        onChange={(e) => props.updateTask(props.task.id, e.target.value)}
+                        value={props.task.text}
+                        onBlur={toggleEditMode}
+                        autoFocus
+                    />
+
+                    <div className="flex gap-1 cursor-default">
+                        <div className="h-6 w-6 shadow bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer">
+                            <TiTick />
+                        </div>
+                    </div>
+                </form>
+
+
+            </>
+        )
+    }
+
+
+    if (isDragging) {
+        return (
+            <div
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
+                className="border border-dashed border-rose-600 shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
+            >
+                <p className="font-semibold text-zinc-800">.</p>
+
+                <div className="flex gap-1 cursor-default">
+                </div>
+            </div>
+        )
+    }
+
 
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...attributes}
-            {...listeners} 
-            className="bg-white border shadow flex justify-between rounded-lg py-2 px-4 cursor-grab items-center w-[90%] mx-auto"
+            {...listeners}
+            className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
         >
-            <p className="text-gray-700 font-semibold">{props.task.text}</p>
+            <>
+                <p className="text-white text-sm font flex flex-wrap w-32 text-wrap truncate">{props.task.text}</p>
 
-            <div className="flex gap-1 cursor-default">
-                <div className="h-6 w-6 shadow bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer">
-                    <TiTick />
-                </div>
+                <div className="flex gap-1 cursor-default">
+                    <div
+                        onClick={() =>
+                            toggleEditMode()
+                        }
+                        className="h-6 w-6 shadow text-green-500 text-lg rounded-full flex justify-center items-center hover:scale-110 active:scale-95 cursor-pointer"
+                    >
+                        <MdEdit />
+                    </div>
 
-                <div className="h-6 w-6 shadow bg-red-500 text-white rounded-full flex justify-center items-center cursor-pointer hover:scale-105 active:scale-95">
-                    <MdDeleteForever />
+                    <div
+                        className="h-6 w-6 shadow text-red-500 text-lg rounded-full flex justify-center items-center cursor-pointer hover:scale-110 active:scale-95"
+                        onClick={() => props.deleteTask(props.task.id)}
+                    >
+                        <MdDeleteForever />
+                    </div>
                 </div>
-            </div>
+            </>
         </div>
     )
 }
