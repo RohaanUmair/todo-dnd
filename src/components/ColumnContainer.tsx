@@ -7,6 +7,7 @@ import { MdAddCircleOutline, MdDeleteForever, MdDeleteSweep, MdEdit } from 'reac
 import { TbDots } from 'react-icons/tb';
 import Task from './Task';
 import { TiTick } from 'react-icons/ti';
+import { Tooltip } from 'react-tooltip'
 
 function ColumnContainer(props: any) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
@@ -44,7 +45,7 @@ function ColumnContainer(props: any) {
             setIsEditingTitle(false);
             return;
         }
-        
+
         if (newTitle.trim() === '') {
             setNewTitle(props.col.title);
         } else {
@@ -70,7 +71,7 @@ function ColumnContainer(props: any) {
     return (
         <>
             <div
-                className={`w-60 bg-zinc-800 rounded pb-5 h-[350px] border border-zinc-950`}
+                className={`w-60 bg-zinc-800 rounded pb-5 max-h-[350px] border border-zinc-950`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
@@ -99,7 +100,17 @@ function ColumnContainer(props: any) {
                                 </div>
                             </form>
                         ) : (
-                            <h3 className="text-white text-sm text-wrap truncate">{props.col.title}</h3>
+                            props.col.title.length > 23 ? (
+                                <h3
+                                    className="text-white text-sm truncate"
+                                    data-tooltip-id="my-tooltip"
+                                    data-tooltip-content={props.col.title}
+                                >
+                                    {props.col.title}
+                                </h3>
+                            ) : (
+                                <h3 className="text-white text-sm truncate">{props.col.title}</h3>
+                            )
                         )
                     }
                     <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
@@ -139,7 +150,7 @@ function ColumnContainer(props: any) {
                     </div>
                 </div>
 
-                <div className={`h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
+                <div className={`max-h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
                     <SortableContext items={props.tasks.map((task) => task.id)}>
                         {props.tasks.length > 0 ? (
                             props.tasks.map((task: any, index: number) => (
@@ -147,7 +158,7 @@ function ColumnContainer(props: any) {
                             ))
                         ) : (
                             <div
-                                className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6"
+                                className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-4"
                             >
                                 Drag a task here or create a new one
                             </div>
@@ -156,9 +167,18 @@ function ColumnContainer(props: any) {
                 </div>
 
                 <div className="flex justify-center mt-4">
-                    <div
+                    {/* <div
                         onClick={() => props.addNewTask(props.col.id)}
                         className="w-[80%] mx-auto h-10 border-dashed border-2 border-zinc-500  rounded flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
+                    >
+                        <h1 className=" font-bold flex items-center justify-between w-full">
+                            <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
+                        </h1>
+                    </div> */}
+
+                    <div
+                        onClick={() => props.addNewTask(props.col.id)}
+                        className="w-[80%] mx-auto h-10 border-2 border-black bg-black rounded flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
                     >
                         <h1 className=" font-bold flex items-center justify-between w-full">
                             <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
@@ -166,6 +186,9 @@ function ColumnContainer(props: any) {
                     </div>
                 </div>
             </div>
+
+
+            <Tooltip id="my-tooltip" />
         </>
     )
 }

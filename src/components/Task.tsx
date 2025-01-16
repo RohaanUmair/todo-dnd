@@ -4,6 +4,9 @@ import { MdDeleteForever, MdEdit } from 'react-icons/md';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { TiTick } from 'react-icons/ti';
+import { Tooltip } from 'react-tooltip'
+
+
 
 function Task(props: any) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
@@ -20,25 +23,11 @@ function Task(props: any) {
     };
 
 
-    // const [isEditingTask, setIsEditingTask] = useState<boolean>(false);
-    // const [newTask, setNewTask] = useState<string>(props.task.text);
-
-
     const [editMode, setEditMode] = useState<boolean>(false);
 
     const toggleEditMode = () => {
         setEditMode(!editMode);
     };
-
-
-    // const handleEditTask = () => {
-    //     if (newTask.trim() === '') {
-    //         setNewTask(props.task.text);
-    //     } else {
-    //         props.editTask(props.task.id, newTask);
-    //     }
-    //     setIsEditingTask(false);
-    // }
 
 
     if (editMode) {
@@ -101,7 +90,19 @@ function Task(props: any) {
             className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
         >
             <>
-                <p className="text-white text-sm font flex flex-wrap w-32 text-wrap truncate">{props.task.text}</p>
+                {
+                    props.task.text.length > 13 ? (
+                        <p
+                            className="text-white text-sm font w-32 truncate "
+                            data-tooltip-id="my-tooltip"
+                            data-tooltip-content={props.task.text}
+                        >
+                            {props.task.text}
+                        </p>
+                    ) : (
+                        <p className="text-white text-sm font w-32 truncate">{props.task.text}</p>
+                    )
+                }
 
                 <div className="flex gap-1 cursor-default">
                     <div
@@ -120,6 +121,8 @@ function Task(props: any) {
                         <MdDeleteForever />
                     </div>
                 </div>
+
+                <Tooltip id="my-tooltip" />
             </>
         </div>
     )

@@ -1,5 +1,5 @@
 'use client';
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import ColumnContainer from './ColumnContainer';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, closestCorners, rectIntersection, closestCenter, pointerWithin } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
@@ -7,6 +7,9 @@ import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
 import { BiPlus, BiPlusCircle } from 'react-icons/bi';
+import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
+import { FaUserMinus } from 'react-icons/fa';
+import { onSnapshot, TaskState } from 'firebase/firestore';
 
 
 interface Column {
@@ -20,12 +23,74 @@ interface Task {
     text: string;
 }
 
-function Board() {
-    const [cols, setCols] = useState<Column[]>([{ title: 'To Do', id: 1 }, { title: 'In Progress', id: 2 }, { title: 'Done', id: 3 }]);
+
+function Board({ userEmail }: { userEmail: string | null }) {
+    const [cols, setCols] = useState<Column[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
+
+    const [checkCols, setCheckCols] = useState<Column[]>();
+    const [checkTasks, setCheckTasks] = useState<Task[]>();
 
     const [activeCol, setActiveCol] = useState<Column | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+
+    useEffect(() => {
+        async function getData() {
+            const colRef = doc(db, "columns", userEmail as string);
+            const colSnap = await getDoc(colRef);
+
+            if (colSnap.exists()) {
+                console.log("Column data:", colSnap.data().data);
+                const colData = colSnap.data().data;
+                setCols(colData);
+            } else {
+                console.log("No such document!");
+                setCols([{ title: 'To Do', id: 1 }, { title: 'In Progress', id: 2 }, { title: 'Done', id: 3 }]);
+            }
+
+            const unsubCol = onSnapshot(doc(db, "columns", userEmail as string), (doc) => {
+                console.log("Current data: ", doc.data()?.data);
+                const colData = doc.data()?.data;
+                setCols(colData);
+                setCheckCols(colData);
+            });
+
+
+
+            const taskRef = doc(db, "tasks", userEmail as string);
+            const docSnap = await getDoc(taskRef);
+
+            if (docSnap.exists()) {
+                console.log("Task data:", docSnap.data().data);
+                const taskData = docSnap.data().data;
+                setTasks(taskData);
+            } else {
+                console.log("No such document!");
+            }
+
+            const unsubTask = onSnapshot(doc(db, "tasks", userEmail as string), (doc) => {
+                console.log("Current data: ", doc.data()?.data);
+                const tasksData = doc.data()?.data;
+                setTasks(tasksData);
+                setCheckTasks(tasksData);
+            });
+        }
+
+        getData();
+    }, []);
+
+    useEffect(() => {
+        if (cols.length == 0) return;
+
+        if (checkCols == cols && checkTasks == tasks) return;
+
+        addDataToDb(cols, tasks, userEmail as string);
+
+
+    }, [tasks, cols]);
+
+
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 10 } })
@@ -83,29 +148,49 @@ function Board() {
 
     const onDragOver = (e: DragEndEvent) => {
         const { active, over } = e;
+
         if (!over) return;
+        if (active.id === over.id) return;
 
-        const activeId = active.id;
-        const overId = over.id;
+        const activeType = active.data.current?.type;
+        const overType = over.data.current?.type;
 
-        if (activeId === overId) return;
+        if (activeType === 'Task' && overType === 'Task') {
+            setTasks((prevTasks) => {
+                const columns = prevTasks.reduce((acc, task) => {
+                    acc[task.colId] = acc[task.colId] || [];
+                    acc[task.colId].push(task);
+                    return acc;
+                }, {} as Record<string, typeof prevTasks>);
 
-        const isActiveATask = active.data.current?.type === 'Task';
-        const isOverATask = over.data.current?.type === 'Task';
+                const activeTask = prevTasks.find((task) => task.id === active.id);
+                const overTask = prevTasks.find((task) => task.id === over.id);
 
-        if (isActiveATask && isOverATask) {
-            setTasks((tasks) => {
-                const activeTaskIndex = tasks.findIndex((task) => task.id === activeId);
-                const overTaskIndex = tasks.findIndex((task) => task.id === overId);
+                if (activeTask?.colId === overTask?.colId) {
+                    const activeTaskIndex = tasks.findIndex((task) => task.id === active.id);
+                    const overTaskIndex = tasks.findIndex((task) => task.id === over.id);
 
-                if (tasks[activeTaskIndex].colId !== tasks[overTaskIndex].colId) {
-                    tasks[activeTaskIndex].colId = tasks[overTaskIndex].colId;
+                    return arrayMove(tasks, activeTaskIndex, overTaskIndex);
                 }
 
-                return arrayMove(tasks, activeTaskIndex, overTaskIndex);
+                if (!activeTask || !overTask) return prevTasks;
+
+                const activeColumnTasks = columns[activeTask.colId];
+                const activeIndex = activeColumnTasks.findIndex((task) => task.id === active.id);
+                activeColumnTasks.splice(activeIndex, 1);
+
+                const targetColumnTasks = columns[overTask.colId];
+                const overIndex = targetColumnTasks.findIndex((task) => task.id === over.id);
+
+                activeTask.colId = overTask.colId;
+
+                targetColumnTasks.splice(overIndex, 0, activeTask);
+
+                return Object.values(columns).flat();
             });
         }
-    }
+    };
+
 
     const addNewTask = (colId: number) => {
         const tasksInThisCol = tasks.filter((task) => task.colId === colId);
@@ -133,6 +218,15 @@ function Board() {
     };
 
     const deleteCol = (colTitle: string) => {
+        if (colTitle === 'To Do' || colTitle === 'In Progress' || colTitle === 'Done') {
+            const notify = () => toast.error('Cannot delete default columns!', {
+                duration: 1000,
+                position: 'top-right',
+            });
+            notify();
+            return;
+        }
+
         setCols(cols.filter((col) => col.title !== colTitle));
 
         const notify = () => toast.success('Deleted!', {
@@ -150,7 +244,7 @@ function Board() {
         if (!heading) return;
 
         if (cols.find((col) => col.title === heading)) {
-            const notify = () => toast.error('Column with this title already exists!',  {
+            const notify = () => toast.error('Column with this title already exists!', {
                 duration: 1000,
                 position: 'top-right',
             });
@@ -168,7 +262,7 @@ function Board() {
     const editColTitle = (colId: number, newTitle: string) => {
         const checkUnique = cols.find((col) => col.title == newTitle);
         if (checkUnique) {
-            const notify = () => toast.error('Column with this title already exists!',  {
+            const notify = () => toast.error('Column with this title already exists!', {
                 duration: 1000,
                 position: 'top-right',
             });
@@ -178,7 +272,7 @@ function Board() {
 
         setCols(cols.map((col) => col.id === colId ? { ...col, title: newTitle } : col));
 
-        const notify = () => toast.success('Updated!',  {
+        const notify = () => toast.success('Updated!', {
             duration: 1000,
             position: 'top-right',
         });
@@ -188,7 +282,7 @@ function Board() {
     const editTask = (taskId: number, newText: string) => {
         setTasks(tasks.map((task) => task.id === taskId ? { ...task, text: newText } : task));
 
-        const notify = () => toast.success('Updated!',  {
+        const notify = () => toast.success('Updated!', {
             duration: 1000,
             position: 'top-right',
         });
@@ -222,21 +316,27 @@ function Board() {
     return (
         <div className='overflow-y-hidden h-screen w-full bg-zinc-900'>
 
-            <h1 className='text-center text-white text-4xl mt-8 font-semibold'>TASK MANAGEMENT</h1>
+            <div className='fixed'>
+                <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
+                    <h1 className='text-center text-white text-4xl font-semibold'>TASK MANAGEMENT</h1>
+                    <button className='bg-blue-900 h-10 w-28 text-white absolute active:scale-95 flex justify-center right-0 gap-2 text-lg rounded-sm items-center hover:bg-red-900 transition-colors duration-500' onClick={handleSignout}><FaUserMinus /> Logout</button>
+                </div>
 
-            <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
-                <input className="outline-none py-3 w-96 rounded px-5 bg-zinc-800 text-zinc-200" placeholder="Type Something..." type="text" value={input} onChange={(e) => setInput(e.target.value)} />
 
-                <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded pl-2 bg-zinc-800 text-white text-sm" >
-                    {
-                        cols.map((col, index) => {
-                            return <option key={index} value={col.id}>{col.title}</option>
-                        })
-                    }
-                </select>
+                <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
+                    <input className="outline-none py-3 w-96 rounded px-5 bg-zinc-800 text-zinc-200" placeholder="Type Something..." type="text" value={input} onChange={(e) => setInput(e.target.value)} />
 
-                <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition">Add <BiPlus className='text-xl' /> </button>
-            </form>
+                    <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded pl-2 bg-zinc-800 text-white text-sm" >
+                        {
+                            cols.map((col, index) => {
+                                return <option key={index} value={col.id}>{col.title}</option>
+                            })
+                        }
+                    </select>
+
+                    <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition">Add <BiPlus className='text-xl' /> </button>
+                </form>
+            </div>
 
 
 
@@ -247,7 +347,7 @@ function Board() {
                 sensors={sensors}
                 collisionDetection={rectIntersection}
             >
-                <div className='flex items-start pt-12 h-full w-full justify-start px-10 gap-3'>
+                <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3'>
                     <SortableContext items={cols.map((col) => col.id)} >
                         {cols.map((col) => (
                             <div key={col.id}>
@@ -286,7 +386,7 @@ function Board() {
                                     handleNewCol();
                                     setShowForm(!showForm);
                                 }}
-                                    className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 ${showForm ? 'rounded-b' : 'rounded'}`}
+                                    className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 mr-12 ${showForm ? 'rounded-b' : 'rounded'}`}
                                 >
                                     {
                                         showForm ? heading ? 'Add Card +' : 'Back' : 'New Card +'
@@ -317,6 +417,7 @@ function Board() {
             </DndContext>
 
             <Toaster />
+
         </div>
     )
 }
