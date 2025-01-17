@@ -1,5 +1,5 @@
 'use client';
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import ColumnContainer from './ColumnContainer';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
@@ -10,6 +10,9 @@ import { BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
 import { FaUserMinus } from 'react-icons/fa';
 import { onSnapshot } from 'firebase/firestore';
+import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
+import { CiLogout } from 'react-icons/ci';
+import { MdEmail } from 'react-icons/md';
 
 
 interface Column {
@@ -325,26 +328,93 @@ function Board({ userEmail }: { userEmail: string | null }) {
         setTasks(newTasks);
     }
 
+    const [openProfile, setOpenProfile] = useState<boolean>(false);
+
+    const profileRef = useRef(null);
+    const btnRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (!openProfile) return;
+
+            let a = profileRef?.current as any;
+            let b = btnRef?.current as any;
+            if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
+                setOpenProfile(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [openProfile]);
+
+    
+    // const addColInpRef = useRef(null);
+    // const addColBtnRef = useRef(null);
+
+    // useEffect(() => {
+    //     const handleClickOutside = (e: MouseEvent) => {
+    //         if (!showForm) return;
+
+    //         let a = addColInpRef?.current as any;
+    //         let b = addColBtnRef?.current as any;
+    //         if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
+    //             setHeading('');
+    //             setShowForm(false);
+    //         }
+    //     }
+
+    //     document.addEventListener('mousedown', handleClickOutside);
+
+    //     return () => document.removeEventListener('mousedown', handleClickOutside);
+    // }, [showForm]);
+
+
     return (
         <div className='overflow-y-hidden h-screen w-full bg-zinc-900'>
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
                     <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
-                    <button className='bg-blue-900 h-10 w-28 text-white absolute active:scale-95 flex justify-center right-0 gap-2 text-lg rounded-sm items-center hover:bg-red-900 transition-colors duration-500 max-md:scale-75 max-md:-right-8' onClick={handleSignout}><FaUserMinus /> Logout</button>
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800' onClick={() => setOpenProfile(!openProfile)}>
+                        {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
+                    </button>
+
+                    {
+                        openProfile && (
+                            <div ref={profileRef} className='text-white w-fit h-fit absolute right-0 max-md:right-8 top-10 bg-zinc-600 px-2 rounded-b rounded-l'>
+                                <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded'><MdEmail className='absolute left-4 text-xl' /> {userEmail}</div>
+
+                                <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded hover:bg-zinc-700 cursor-pointer' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
+                            </div>
+                        )
+                    }
                 </div>
 
 
                 <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
-                    <input className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200" placeholder="Type Something..." type="text" value={input} onChange={(e) => setInput(e.target.value)} />
+                    <input
+                        className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200"
+                        placeholder="Type Something..."
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                    />
 
-                    <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded pl-2 bg-zinc-800 text-white text-sm" >
-                        {
-                            cols.map((col, index) => {
-                                return <option key={index} value={col.id}>{col.title}</option>
-                            })
-                        }
-                    </select>
+                    <div className='flex items-center'>
+                        <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded-l pl-2 bg-zinc-800 text-white text-sm" >
+                            {
+                                cols.map((col, index) => {
+                                    return <option className='!w-24' key={index} value={col.id}>{
+                                        col.title.length > 10 ? `${col.title.slice(0, 10)}...` : col.title
+                                    }</option>
+                                })
+                            }
+                        </select>
+
+                        <div className='w-2 h-12 bg-zinc-800 rounded-r'></div>
+                    </div>
 
                     <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition">Add <BiPlus className='text-xl' /> </button>
                 </form>
@@ -379,11 +449,13 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                     }}>
                                     <input type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus onBlur={() => {
                                         handleNewCol();
+                                        setHeading('');
                                         setShowForm(!showForm);
                                     }} onChange={(e) => setHeading(e.target.value)} />
 
                                     <button onClick={() => {
                                         handleNewCol();
+                                        setHeading('');
                                         setShowForm(!showForm);
                                     }}
                                         className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 ${showForm ? 'rounded-b' : 'rounded'}`}

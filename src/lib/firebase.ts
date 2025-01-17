@@ -127,5 +127,7 @@ export {
     db,
     doc,
     getDoc,
-    handleSignout
+    handleSignout,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
 }
