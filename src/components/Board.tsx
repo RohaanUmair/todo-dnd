@@ -6,7 +6,7 @@ import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
-import { BiPlus } from 'react-icons/bi';
+import { BiMenu, BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
 import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
@@ -376,13 +376,17 @@ function Board({ userEmail }: { userEmail: string | null }) {
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
                     <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800' onClick={() => setOpenProfile(!openProfile)}>
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile(!openProfile)}>
                         {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
+                    </button>
+
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-6 max-md:h-6 max-md:-right-0 font-normal hover:bg-blue-800 md:hidden' onClick={() => setOpenProfile(!openProfile)}>
+                        <BiMenu />
                     </button>
 
                     {
                         openProfile && (
-                            <div ref={profileRef} className='text-white w-fit h-fit absolute right-0 max-md:right-8 top-10 bg-zinc-600 px-2 rounded-b rounded-l'>
+                            <div ref={profileRef} className='text-white w-fit h-fit absolute right-0 top-10 bg-zinc-600 px-2 rounded-b rounded-l     max-md:right-0'>
                                 <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded'><MdEmail className='absolute left-4 text-xl' /> {userEmail}</div>
 
                                 <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded hover:bg-zinc-700 cursor-pointer' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
