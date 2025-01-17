@@ -50,7 +50,7 @@ function ColumnContainer(props: any) {
             setNewTitle(props.col.title);
         } else {
             if (newTitle.trim().length > 23) {
-                let arr = [];
+                const arr = [];
 
                 for (let i = 0; i < newTitle.trim().length; i++) {
                     arr.push(newTitle[i]);
@@ -66,7 +66,7 @@ function ColumnContainer(props: any) {
 
                 console.log(arr);
 
-                let finalTitle = arr.join('');
+                const finalTitle = arr.join('');
                 console.log(finalTitle);
 
                 props.editColTitle(props.col.id, finalTitle);
@@ -82,7 +82,7 @@ function ColumnContainer(props: any) {
 
     useEffect(() => {
         const handleCLickOutside = (e: MouseEvent) => {
-            let ref = menuRef?.current as any;
+            const ref = menuRef?.current as any;
             if (ref && !ref.contains(e.target)) {
                 setOpenMenu(false);
             }

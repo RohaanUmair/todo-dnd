@@ -8,7 +8,6 @@ import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
 import { BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
-import { FaUserMinus } from 'react-icons/fa';
 import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
@@ -337,8 +336,8 @@ function Board({ userEmail }: { userEmail: string | null }) {
         const handleClickOutside = (e: MouseEvent) => {
             if (!openProfile) return;
 
-            let a = profileRef?.current as any;
-            let b = btnRef?.current as any;
+            const a = profileRef?.current as any;
+            const b = btnRef?.current as any;
             if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
                 setOpenProfile(false);
             }

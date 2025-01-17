@@ -1,6 +1,6 @@
 'use client';
-import { auth, createAccount, createUserWithEmailAndPassword, loginUser, signInWithEmailAndPassword } from '@/lib/firebase';
-import React, { FormEvent, InputHTMLAttributes, useState } from 'react';
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@/lib/firebase';
+import React, { FormEvent, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 function AuthPage() {
