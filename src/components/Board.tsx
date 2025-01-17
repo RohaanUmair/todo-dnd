@@ -330,13 +330,13 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
-                    <h1 className='text-center text-white text-4xl font-semibold'>TASK MANAGEMENT</h1>
-                    <button className='bg-blue-900 h-10 w-28 text-white absolute active:scale-95 flex justify-center right-0 gap-2 text-lg rounded-sm items-center hover:bg-red-900 transition-colors duration-500' onClick={handleSignout}><FaUserMinus /> Logout</button>
+                    <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
+                    <button className='bg-blue-900 h-10 w-28 text-white absolute active:scale-95 flex justify-center right-0 gap-2 text-lg rounded-sm items-center hover:bg-red-900 transition-colors duration-500 max-md:scale-75 max-md:-right-8' onClick={handleSignout}><FaUserMinus /> Logout</button>
                 </div>
 
 
                 <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
-                    <input className="outline-none py-3 w-96 rounded px-5 bg-zinc-800 text-zinc-200" placeholder="Type Something..." type="text" value={input} onChange={(e) => setInput(e.target.value)} />
+                    <input className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200" placeholder="Type Something..." type="text" value={input} onChange={(e) => setInput(e.target.value)} />
 
                     <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded pl-2 bg-zinc-800 text-white text-sm" >
                         {
