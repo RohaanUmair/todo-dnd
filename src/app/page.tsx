@@ -22,12 +22,7 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
-
-
-  // useEffect(() => {
-  //   !isUserLoggedIn && router.push('/login');
-  // }, [isUserLoggedIn]);
-
+  
 
   return (
     isUserLoggedIn ? (

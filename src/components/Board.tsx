@@ -68,11 +68,14 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 setTasks(taskData);
             } else {
                 console.log("No such document!");
+                setTasks([]);
             }
 
             const unsubTask = onSnapshot(doc(db, "tasks", userEmail as string), (doc) => {
                 console.log("Current data: ", doc.data()?.data);
                 const tasksData = doc.data()?.data;
+
+                if (tasksData == undefined) return;
                 setTasks(tasksData);
                 setCheckTasks(tasksData);
             });
@@ -295,6 +298,13 @@ function Board({ userEmail }: { userEmail: string | null }) {
     const [input, setInput] = useState<string>('');
 
     const [selected, setSelected] = useState<string>('1');
+
+    useEffect(() => {
+        if (cols.length === 0) return;
+
+        setSelected(cols[0].id.toString());
+    }, [cols]);
+
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>, input: string) => {
         e.preventDefault();

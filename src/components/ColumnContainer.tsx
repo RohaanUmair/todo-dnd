@@ -91,6 +91,7 @@ function ColumnContainer(props: any) {
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     onBlur={handleEditColTitle}
                                     autoFocus
+                                    maxLength={40}
                                 />
 
                                 <div
@@ -102,7 +103,7 @@ function ColumnContainer(props: any) {
                         ) : (
                             props.col.title.length > 23 ? (
                                 <h3
-                                    className="text-white text-sm truncate"
+                                    className="text-white text-sm truncate text-wrap"
                                     data-tooltip-id="my-tooltip"
                                     data-tooltip-content={props.col.title}
                                 >

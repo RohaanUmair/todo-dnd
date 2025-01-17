@@ -30,6 +30,14 @@ function Task(props: any) {
     };
 
 
+    const [editTask, setEditTask] = useState<string>(props.task.text);
+
+    const handleEditDone = () => {
+        props.updateTask(props.task.id, editTask);
+        toggleEditMode();
+    };
+
+
     if (editMode) {
         return (
             <>
@@ -37,17 +45,18 @@ function Task(props: any) {
                     className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        toggleEditMode();
+                        handleEditDone();
                     }}
                 >
                     <input
                         type="text"
                         placeholder='Task'
                         className="outline-none w-32 bg-zinc-900 text-sm text-white"
-                        onChange={(e) => props.updateTask(props.task.id, e.target.value)}
-                        value={props.task.text}
-                        onBlur={toggleEditMode}
+                        onChange={(e) => setEditTask(e.target.value)}
+                        value={editTask}
+                        onBlur={() => { handleEditDone() }}
                         autoFocus
+                        maxLength={45}
                     />
 
                     <div className="flex gap-1 cursor-default">
