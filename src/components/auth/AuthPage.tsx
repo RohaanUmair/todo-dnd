@@ -9,8 +9,6 @@ function AuthPage() {
 
     const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
 
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
     const handleLoginUser = (e: FormEvent) => {
         e.preventDefault();
         loginUser(email, password);
@@ -52,7 +50,7 @@ function AuthPage() {
 
                         <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600'>Login</button>
 
-                        <p className='text-sm'>Don't have an account?
+                        <p className='text-sm'>Dont have an account?
                             <span className='text-blue-500 cursor-pointer' onClick={() => setShowLoginForm(false)}>  Create Account</span>
                         </p>
 

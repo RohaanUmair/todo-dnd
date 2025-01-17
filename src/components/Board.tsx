@@ -1,15 +1,15 @@
 'use client';
 import React, { FormEvent, useEffect, useState } from 'react'
 import ColumnContainer from './ColumnContainer';
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, closestCorners, rectIntersection, closestCenter, pointerWithin } from '@dnd-kit/core';
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, rectIntersection } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
-import { BiPlus, BiPlusCircle } from 'react-icons/bi';
+import { BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
 import { FaUserMinus } from 'react-icons/fa';
-import { onSnapshot, TaskState } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 
 
 interface Column {
@@ -55,6 +55,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 setCols(colData);
                 setCheckCols(colData);
             });
+            console.log(unsubCol);
 
 
 
@@ -75,6 +76,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 setTasks(tasksData);
                 setCheckTasks(tasksData);
             });
+            console.log(unsubTask);
         }
 
         getData();

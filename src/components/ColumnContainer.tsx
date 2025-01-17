@@ -151,7 +151,7 @@ function ColumnContainer(props: any) {
                 </div>
 
                 <div className={`max-h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
-                    <SortableContext items={props.tasks.map((task) => task.id)}>
+                    <SortableContext items={props.tasks.map((task: any) => task.id)}>
                         {props.tasks.length > 0 ? (
                             props.tasks.map((task: any, index: number) => (
                                 <Task updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
