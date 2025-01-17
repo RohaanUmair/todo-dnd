@@ -58,7 +58,7 @@ function ColumnContainer(props: any) {
     if (isDragging) {
         return (
             <div
-                className={`w-60 border-rose-600 border-dashed border-2 rounded pb-5 h-[350px] relative`}
+                className={`w-60 border-rose-600 border-dashed border-2 rounded  h-[350px] relative`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
@@ -71,7 +71,7 @@ function ColumnContainer(props: any) {
     return (
         <>
             <div
-                className={`w-60 bg-zinc-800 rounded pb-5 max-h-[350px] border border-zinc-950`}
+                className={`w-60 bg-zinc-800 rounded  max-h-[350px] border border-zinc-950`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
@@ -167,6 +167,7 @@ function ColumnContainer(props: any) {
                     </SortableContext>
                 </div>
 
+            </div>
                 <div className="flex justify-center mt-4">
                     {/* <div
                         onClick={() => props.addNewTask(props.col.id)}
@@ -182,11 +183,10 @@ function ColumnContainer(props: any) {
                         className="w-[80%] mx-auto h-10 border-2 border-black bg-black rounded flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
                     >
                         <h1 className=" font-bold flex items-center justify-between w-full">
-                            <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
+                            <span className="flex items-center gap-2 text-zinc-500">Add Task<MdAddCircleOutline /></span>
                         </h1>
                     </div>
                 </div>
-            </div>
 
 
             <Tooltip id="my-tooltip" />
