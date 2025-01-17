@@ -380,8 +380,8 @@ function Board({ userEmail }: { userEmail: string | null }) {
                         {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
                     </button>
 
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-6 max-md:h-6 max-md:-right-0 font-normal hover:bg-blue-800 md:hidden' onClick={() => setOpenProfile(!openProfile)}>
-                        <BiMenu />
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800 md:hidden' onClick={() => setOpenProfile(!openProfile)}>
+                        <BiMenu className='text-3xl' />
                     </button>
 
                     {
@@ -398,7 +398,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
                 <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
                     <input
-                        className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200"
+                        className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200    max-md:w-24"
                         placeholder="Type Something..."
                         type="text"
                         value={input}
@@ -419,7 +419,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                         <div className='w-2 h-12 bg-zinc-800 rounded-r'></div>
                     </div>
 
-                    <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition">Add <BiPlus className='text-xl' /> </button>
+                    <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition      max-md:w-12"> <BiPlus className='text-xl' /> </button>
                 </form>
             </div>
 
