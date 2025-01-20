@@ -139,7 +139,7 @@ function ColumnContainer(props: any) {
                                 </div>
                             </form>
                         ) : (
-                            props.col.title.length > 23 ? (
+                            props.col.title.length > 19 ? (
                                 <h3
                                     className="text-white text-sm truncate"
                                     data-tooltip-id="my-tooltip"

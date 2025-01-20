@@ -25,16 +25,41 @@ function Task(props: any) {
 
     const [editMode, setEditMode] = useState<boolean>(false);
 
-    const toggleEditMode = () => {
-        setEditMode(!editMode);
-    };
-
-
     const [editTask, setEditTask] = useState<string>(props.task.text);
 
     const handleEditDone = () => {
-        props.updateTask(props.task.id, editTask);
-        toggleEditMode();
+        // props.updateTask(props.task.id, editTask);
+        // setEditMode(!editMode);
+
+        if (editTask.trim() === props.task.text) {
+            setEditMode(false);
+            return;
+        }
+
+        if (editTask.trim() === '') {
+            setEditTask(props.task.text);
+        } else {
+            if (editTask.trim().length > 23) {
+                const arr = [];
+
+                for (let i = 0; i < editTask.trim().length; i++) {
+                    arr.push(editTask[i]);
+                }
+
+                for (let i = 0; i < arr.length / 23; i++) {
+                    if (i === 0) continue;
+                    arr.splice(22 * i + 1, 0, ' ');
+                }
+
+                const finalTask = arr.join('');
+                console.log(finalTask);
+
+                props.updateTask(props.task.id, finalTask);
+            } else {
+                props.updateTask(props.task.id, editTask);
+            }
+        }
+        setEditMode(false);
     };
 
 
@@ -56,7 +81,6 @@ function Task(props: any) {
                         value={editTask}
                         onBlur={() => { handleEditDone() }}
                         autoFocus
-                        maxLength={45}
                     />
 
                     <div className="flex gap-1 cursor-default">
@@ -116,7 +140,7 @@ function Task(props: any) {
                 <div className="flex gap-1 cursor-default">
                     <div
                         onClick={() =>
-                            toggleEditMode()
+                            setEditMode(!editMode)
                         }
                         className="h-6 w-6 shadow text-green-500 text-lg rounded-full flex justify-center items-center hover:scale-110 active:scale-95 cursor-pointer"
                     >
@@ -131,7 +155,7 @@ function Task(props: any) {
                     </div>
                 </div>
 
-                <Tooltip id="my-tooltip" />
+                <Tooltip id="my-tooltip" style={{ textWrap: 'wrap', width: 300, display: 'hidden' }} />
             </>
         </div>
     )
