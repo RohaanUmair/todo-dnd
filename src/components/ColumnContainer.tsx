@@ -97,7 +97,7 @@ function ColumnContainer(props: any) {
     if (isDragging) {
         return (
             <div
-                className={`w-60 border-rose-600 border-dashed border-2 rounded pb-5 h-[350px] relative`}
+                className={`w-60 border-rose-600 z-50 border-dashed border-2 rounded pb-5 h-[350px] relative`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
@@ -110,7 +110,7 @@ function ColumnContainer(props: any) {
     return (
         <>
             <div
-                className={`w-60 bg-zinc-800 pb-5 h-[350px]`}
+                className={`w-60 bg--800 pb-5 h-[350px]`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
@@ -225,7 +225,7 @@ function ColumnContainer(props: any) {
                     </div>
                 </div>
 
-                <div className='bg-zinc-900 h-full w-full'></div>
+                <div className='bg-transparent h-full w-full -z-10'></div>
             </div>
 
 

@@ -120,7 +120,7 @@ function Task(props: any) {
             style={style}
             {...attributes}
             {...listeners}
-            className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
+            className="bg-zinc-800 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
         >
             <>
                 {
