@@ -348,26 +348,27 @@ function Board({ userEmail }: { userEmail: string | null }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [openProfile]);
 
-    
-    // const addColInpRef = useRef(null);
-    // const addColBtnRef = useRef(null);
 
-    // useEffect(() => {
-    //     const handleClickOutside = (e: MouseEvent) => {
-    //         if (!showForm) return;
 
-    //         let a = addColInpRef?.current as any;
-    //         let b = addColBtnRef?.current as any;
-    //         if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
-    //             setHeading('');
-    //             setShowForm(false);
-    //         }
-    //     }
+    const inputColRef = useRef(null);
+    const addColBtnRef = useRef(null);
 
-    //     document.addEventListener('mousedown', handleClickOutside);
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (!showForm) return;
 
-    //     return () => document.removeEventListener('mousedown', handleClickOutside);
-    // }, [showForm]);
+            const a = inputColRef?.current as any;
+            const b = addColBtnRef?.current as any;
+            if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
+                setHeading('');
+                setShowForm(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showForm]);
 
 
     return (
@@ -449,14 +450,12 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                         e.preventDefault();
                                         handleNewCol();
                                         setShowForm(!showForm);
-                                    }}>
-                                    <input type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus onBlur={() => {
-                                        handleNewCol();
                                         setHeading('');
-                                        setShowForm(!showForm);
-                                    }} onChange={(e) => setHeading(e.target.value)} />
+                                    }}>
+                                    <input ref={inputColRef} type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus
+                                        onChange={(e) => setHeading(e.target.value)} />
 
-                                    <button onClick={() => {
+                                    <button ref={addColBtnRef} onClick={() => {
                                         handleNewCol();
                                         setHeading('');
                                         setShowForm(!showForm);

@@ -1,223 +1,197 @@
 'use client';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { useState } from 'react';
+import { SyncLoader } from 'react-spinners';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@/lib/firebase';
-import React, { FormEvent, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 function AuthPage() {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [passwordError, setPasswordError] = useState<string>('');
-    const [emailError, setEmailError] = useState<string>('');
-    const [username, setUsername] = useState<string>('');
-
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-    const handlePasswordChange = (e: any) => {
-        const value = e?.target?.value;
-        setPassword(value);
-
-        if (value.length < 6) {
-            setPasswordError('Password must be at least 6 characters long');
-        } else {
-            setPasswordError('');
-        }
-    };
-
-    const handleEmailChange = (e: any) => {
-        const value = e?.target?.value;
-        setEmail(value);
-
-        if (value.includes('@') && value.includes('.')) {
-            setEmailError('');
-        } else {
-            setEmailError('Invalid Email');
-        }
-    };
-
     const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
 
-    const handleLoginUser = (e: FormEvent) => {
-        setIsSubmitting(true);
-
-        e.preventDefault();
-        if (password.length < 6) return;
-
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log('logged in', user);
-
-                setIsSubmitting(false);
-            })
-            .catch((error) => {
-                const errorMessage = error.message;
-
-                setIsSubmitting(false);
-
-                console.log(errorMessage);
-
-                if (errorMessage == 'Firebase: Error (auth/invalid-credential).') {
-                    const notify = () => toast.error('Invalid credentials!', {
-                        duration: 1000,
-                        position: 'top-center',
-                    });
-                    notify();
-                }
-            });
-    };
-
-    const handleCreateAccount = (e: FormEvent) => {
-        setIsSubmitting(true);
-
-        e.preventDefault();
-
-        if (password.length < 6) return;
-
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log('account created', user);
-
-                setIsSubmitting(false);
-            })
-            .catch((error) => {
-                const errorMessage = error.message;
-                console.log(errorMessage);
-                setIsSubmitting(false);
-
-                if (errorMessage == 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
-                    const notify = () => toast.error('Password too short!', {
-                        duration: 1000,
-                        position: 'top-center',
-                    });
-                    notify();
-                } else if (errorMessage == 'Firebase: Error (auth/email-already-in-use).') {
-                    const notify = () => toast.error('Email already in use!', {
-                        duration: 1000,
-                        position: 'top-center',
-                    });
-                    notify();
-                } else if (errorMessage == 'Firebase: Error (auth/invalid-email).') {
-                    const notify = () => toast.error('Invalid email!', {
-                        duration: 1000,
-                        position: 'top-center',
-                    });
-                    notify();
-                } else {
-                    const notify = () => toast.error('An error occured!', {
-                        duration: 1000,
-                        position: 'top-center',
-                    });
-                    notify();
-                }
-            });
-    };
-
-
-    const switchForm = (switchTo: 'login' | 'signup') => {
-        setEmail('');
-        setPassword('');
-
-        setEmailError('');
-        setPasswordError('');
-
-        if (switchTo == 'login') {
+    const switchForm = (switchTo: 'login' | 'signup', resetForm: any) => {
+        if (switchTo === 'login') {
             setShowLoginForm(true);
-        } else if (switchTo == 'signup') {
+            resetForm({ values: { loginEmail: '', loginPassword: '' } });
+        } else if (switchTo === 'signup') {
             setShowLoginForm(false);
+            resetForm({ values: { signupEmail: '', signupPassword: '', signupUsername: '' } });
         }
     };
 
 
     return (
-        <div className='h-screen w-screen text-white flex justify-center items-center bg-zinc-800'>
-            {
-                showLoginForm ? (
-                    <form onSubmit={handleLoginUser} className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
-                        <h1 className="text-center text-4xl font-semibold px-12">Login</h1>
+        showLoginForm ? (
+            <Formik
+                initialValues={{ loginEmail: '', loginPassword: '' }}
+                validationSchema={Yup.object({
+                    loginEmail: Yup.string().email('Invalid email address').required('Required'),
+                    loginPassword: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required')
+                        .min(6, 'Must be 6 characters or more'),
+                })}
+                onSubmit={(values, { setSubmitting }) => {
+                    setTimeout(() => {
+                        signInWithEmailAndPassword(auth, values.loginEmail, values.loginPassword)
+                            .then((userCredential) => {
+                                const user = userCredential.user;
+                                console.log('logged in', user);
+                                setSubmitting(false);
+                            })
+                            .catch((error) => {
+                                const errorMessage = error.message;
 
-                        <div className="w-full flex flex-col px-12 gap-1">
-                            <label className="text-lg">Email</label>
-                            <input
-                                value={email}
-                                onChange={handleEmailChange}
-                                type="email"
-                                className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600"
-                            />
-                            {emailError && <p className="text-red-500 text-sm my-1">{emailError}</p>}
-                        </div>
+                                if (errorMessage == 'Firebase: Error (auth/invalid-credential).') {
+                                    const notify = () => toast.error('Invalid credentials!', {
+                                        duration: 1000,
+                                        position: 'top-center',
+                                    });
+                                    notify();
+                                }
+                                setSubmitting(false);
+                            });
 
-                        <div className="w-full flex flex-col px-12 gap-1">
-                            <label className="text-lg">Password</label>
-                            <input
-                                value={password}
-                                onChange={handlePasswordChange}
-                                type="password"
-                                className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600"
-                            />
-                            {passwordError && <p className="text-red-500 text-sm my-1">{passwordError}</p>}
-                        </div>
+                    }, 400);
+                }}
+            >
+                {({ resetForm, isSubmitting }) => (
+                    <div className='h-screen w-screen text-white flex justify-center items-center bg-zinc-800'>
+                        <Form className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
+                            <h1 className="text-center text-4xl font-semibold px-12">Login</h1>
 
-                        <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600' disabled={isSubmitting}>
-                            {isSubmitting ? 'Logging In...' : 'Login'}
-                        </button>
+                            <div className="w-full flex flex-col px-12 gap-1">
+                                <label htmlFor='loginEmail' className="text-lg">Email</label>
+                                <Field name="loginEmail" type="email" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                <div className="text-red-700 text-sm my-1">
+                                    <ErrorMessage name="loginEmail" />
+                                </div>
+                            </div>
 
-                        <p className='text-sm'>Dont have an account?
-                            <span className='text-blue-500 cursor-pointer' onClick={() => switchForm('signup')}>  Create Account</span>
-                        </p>
+                            <div className="w-full flex flex-col px-12 gap-1">
+                                <label htmlFor='loginPassword' className="text-lg">Password</label>
+                                <Field name="loginPassword" type="password" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                <div className="text-red-700 text-sm my-1">
+                                    <ErrorMessage name="loginPassword" />
+                                </div>
+                            </div>
 
-                    </form>
-                ) : (
-                    <form onSubmit={handleCreateAccount} className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
-                        <h1 className='text-center text-4xl font-semibold px-12'>SignUp</h1>
+                            <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600' type="submit">
+                                {isSubmitting ? (
+                                    <SyncLoader className='mx-auto' size={10} color='#fff' />
+                                ) : (
+                                    'Login'
+                                )}
+                            </button>
 
-                        <div className='w-full flex flex-col px-12 gap-1'>
-                            <label className='text-lg'>Username</label>
-                            <input
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                type="text"
-                                className='h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600'
-                            />
-                        </div>
+                            <p className='text-sm'>Dont have an account?
+                                <span className='text-blue-500 cursor-pointer' onClick={() => switchForm('signup', resetForm)}>  Create Account</span>
+                            </p>
+                        </Form>
+                        <Toaster />
+                    </div>
+                )}
+            </Formik>
+        ) : (
+            <Formik
+                initialValues={{ signupEmail: '', signupPassword: '', signupUsername: '' }}
+                validationSchema={Yup.object({
+                    signupEmail: Yup.string().email('Invalid email address').required('Required'),
+                    signupPassword: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required')
+                        .min(6, 'Must be 6 characters or more'),
+                    signupUsername: Yup.string(),
+                })}
+                onSubmit={(values, { setSubmitting }) => {
+                    setTimeout(() => {
+                        createUserWithEmailAndPassword(auth, values.signupEmail, values.signupPassword)
+                            .then((userCredential) => {
+                                const user = userCredential.user;
+                                console.log('account created', user);
+                                setSubmitting(false);
+                            })
+                            .catch((error) => {
+                                const errorMessage = error.message;
+                                console.log(errorMessage);
 
-                        <div className='w-full flex flex-col px-12 gap-1'>
-                            <label className='text-lg'>Email</label>
-                            <input
-                                value={email}
-                                onChange={handleEmailChange}
-                                type="email"
-                                className='h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600'
-                            />
-                            {emailError && <p className="text-red-500 text-sm my-1">{emailError}</p>}
-                        </div>
+                                if (errorMessage == 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+                                    const notify = () => toast.error('Password too short!', {
+                                        duration: 1000,
+                                        position: 'top-center',
+                                    });
+                                    notify();
+                                } else if (errorMessage == 'Firebase: Error (auth/email-already-in-use).') {
+                                    const notify = () => toast.error('Email already in use!', {
+                                        duration: 1000,
+                                        position: 'top-center',
+                                    });
+                                    notify();
+                                } else if (errorMessage == 'Firebase: Error (auth/invalid-email).') {
+                                    const notify = () => toast.error('Invalid email!', {
+                                        duration: 1000,
+                                        position: 'top-center',
+                                    });
+                                    notify();
+                                } else {
+                                    const notify = () => toast.error('An error occured!', {
+                                        duration: 1000,
+                                        position: 'top-center',
+                                    });
+                                    notify();
+                                }
+                                setSubmitting(false);
+                            });
+                    }, 400);
+                }}
+            >
+                {({ resetForm, isSubmitting }) => (
+                    <div className='h-screen w-screen text-white flex justify-center items-center bg-zinc-800'>
+                        <Form className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
+                            <h1 className="text-center text-4xl font-semibold px-12">Signup</h1>
 
-                        <div className='w-full flex flex-col px-12 gap-1'>
-                            <label className='text-lg'>Password</label>
-                            <input
-                                value={password}
-                                onChange={handlePasswordChange}
-                                type="password"
-                                className='h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600'
-                            />
-                            {passwordError && <p className="text-red-500 text-sm my-1">{passwordError}</p>}
-                        </div>
+                            <div className="w-full flex flex-col px-12 gap-1">
+                                <label htmlFor='signupUsername' className="text-lg">Username</label>
+                                <Field name="signupUsername" type="text" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                <div className="text-red-700 text-sm my-1">
+                                    <ErrorMessage name="signupUsername" />
+                                </div>
+                            </div>
 
-                        <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-rose-600' disabled={isSubmitting}>
-                            {isSubmitting ? 'Signing Up...' : 'SIgnup'}
-                        </button>
+                            <div className="w-full flex flex-col px-12 gap-1">
+                                <label htmlFor='signupEmail' className="text-lg">Email</label>
+                                <Field name="signupEmail" type="email" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                <div className="text-red-700 text-sm my-1">
+                                    <ErrorMessage name="signupEmail" />
+                                </div>
+                            </div>
 
-                        <p className='text-sm'>Already have an account?
-                            <span className='text-blue-500 cursor-pointer' onClick={() => switchForm('login')}>  Login now</span>
-                        </p>
+                            <div className="w-full flex flex-col px-12 gap-1">
+                                <label htmlFor='signupPassword' className="text-lg">Password</label>
+                                <Field name="signupPassword" type="password" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                <div className="text-red-700 text-sm my-1">
+                                    <ErrorMessage name="signupPassword" />
+                                </div>
+                            </div>
 
-                    </form>
-                )
-            }
+                            <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600' type="submit">
+                                {isSubmitting ? (
+                                    <SyncLoader className='mx-auto' size={10} color='#fff' />
+                                ) : (
+                                    'Signup'
+                                )}
+                            </button>
 
-            <Toaster />
-        </div>
-    )
+                            <p className='text-sm'>Already have an account?
+                                <span className='text-blue-500 cursor-pointer' onClick={() => switchForm('login', resetForm)}>  Login</span>
+                            </p>
+                        </Form>
+                        <Toaster />
+                    </div>
+                )}
+            </Formik>
+        )
+    );
 }
 
 export default AuthPage;
