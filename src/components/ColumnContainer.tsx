@@ -115,7 +115,7 @@ function ColumnContainer(props: any) {
                 style={style}
                 {...attributes}
             >
-                <div className='rounded border border-teal-900 shadow shadow-[#111] outline-none border-zinc-950'>
+                <div className='rounded border border-teal-900 shadow shadow-[#111] outline-none'>
                     <div
                         {...listeners}
                         className="flex justify-between px-4 items-center py-3 border-b border-black bg-zinc-800 w-full rounded-t cursor-grab"
