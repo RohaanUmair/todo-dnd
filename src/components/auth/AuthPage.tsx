@@ -101,7 +101,9 @@ function AuthPage() {
                         .max(20, 'Must be 20 characters or less')
                         .required('Required')
                         .min(6, 'Must be 6 characters or more'),
-                    signupUsername: Yup.string(),
+                    signupUsername: Yup.string()
+                        .max(20, 'Must be 20 characters or less')
+                        .required('Required'),
                 })}
                 onSubmit={(values, { setSubmitting }) => {
                     setTimeout(() => {
