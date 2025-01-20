@@ -37,7 +37,6 @@ function Board({ userEmail }: { userEmail: string | null }) {
     const [activeCol, setActiveCol] = useState<Column | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-
     useEffect(() => {
         async function getData() {
             const colRef = doc(db, "columns", userEmail as string);
@@ -381,7 +380,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
                     <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile(!openProfile)}>
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile((prev) => !prev)}>
                         {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
                     </button>
 
@@ -453,7 +452,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
             >
                 <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3'>
                     {
-                        cols.length == 0 ? (
+                        cols.length == 0 || checkTasks == undefined ? (
                             <ClipLoader color='#fff' className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2' size={50} />
                         ) : (
                             <>
