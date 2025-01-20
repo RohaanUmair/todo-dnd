@@ -25,7 +25,10 @@ function AuthPage() {
             <Formik
                 initialValues={{ loginEmail: '', loginPassword: '' }}
                 validationSchema={Yup.object({
-                    loginEmail: Yup.string().email('Invalid email address').required('Required'),
+                    loginEmail: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required')
+                        .matches(/@[^.]*\./, 'Invalid email address'),
                     loginPassword: Yup.string()
                         .max(20, 'Must be 20 characters or less')
                         .required('Required')
@@ -38,6 +41,10 @@ function AuthPage() {
                                 const user = userCredential.user;
                                 console.log('logged in', user);
                                 setSubmitting(false);
+                                localStorage.setItem('isLoginSaved', 'true');
+                                if (user?.email) {
+                                    localStorage.setItem('userEmail', user?.email);
+                                }
                             })
                             .catch((error) => {
                                 const errorMessage = error.message;
@@ -56,7 +63,7 @@ function AuthPage() {
                 }}
             >
                 {({ resetForm, isSubmitting }) => (
-                    <div className='h-screen w-screen text-white flex justify-center items-center bg-zinc-800'>
+                    <div className='h-4/5 w-full text-white flex justify-center items-center bg-zinc-900'>
                         <Form className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
                             <h1 className="text-center text-4xl font-semibold px-12">Login</h1>
 
@@ -96,7 +103,10 @@ function AuthPage() {
             <Formik
                 initialValues={{ signupEmail: '', signupPassword: '', signupUsername: '' }}
                 validationSchema={Yup.object({
-                    signupEmail: Yup.string().email('Invalid email address').required('Required'),
+                    signupEmail: Yup.string()
+                        .email('Invalid email address')
+                        .required('Required')
+                        .matches(/@[^.]*\./, 'Invalid email address'),
                     signupPassword: Yup.string()
                         .max(20, 'Must be 20 characters or less')
                         .required('Required')
@@ -112,6 +122,10 @@ function AuthPage() {
                                 const user = userCredential.user;
                                 console.log('account created', user);
                                 setSubmitting(false);
+                                localStorage.setItem('isLoginSaved', 'true');
+                                if (user?.email) {
+                                    localStorage.setItem('userEmail', user?.email);
+                                }
                             })
                             .catch((error) => {
                                 const errorMessage = error.message;
@@ -148,7 +162,7 @@ function AuthPage() {
                 }}
             >
                 {({ resetForm, isSubmitting }) => (
-                    <div className='h-screen w-screen text-white flex justify-center items-center bg-zinc-800'>
+                    <div className='h-4/5 w-full text-white flex justify-center items-center bg-zinc-900'>
                         <Form className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
                             <h1 className="text-center text-4xl font-semibold px-12">Signup</h1>
 

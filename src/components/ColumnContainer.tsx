@@ -110,12 +110,12 @@ function ColumnContainer(props: any) {
     return (
         <>
             <div
-                className={`w-60 bg--800 pb-5 h-[350px]`}
+                className={`w-60 bg--800 pb-5 h-[350px] outline-none`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
             >
-                <div className='rounded border border-zinc-950'>
+                <div className='rounded border shadow shadow-[#111] outline-none border-zinc-950'>
                     <div
                         {...listeners}
                         className="flex justify-between px-4 items-center py-3 border-b border-black bg-zinc-800 w-full rounded-t cursor-grab"
@@ -167,12 +167,22 @@ function ColumnContainer(props: any) {
                                                     Edit <MdEdit className="text-xl text-yellow-400" />
                                                 </li>
 
-                                                <li
-                                                    className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
-                                                    onClick={() => props.deleteAllItems(props.col.id)}
-                                                >
-                                                    Delete All <MdDeleteSweep className="text-xl text-red-600" />
-                                                </li>
+                                                {
+                                                    props.tasks.length == 0 ? (
+                                                        <li
+                                                            className={`cursor-not-allowed hover:bg-zinc-900 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b`}
+                                                        >
+                                                            Delete All <MdDeleteSweep className="text-xl text-red-600" />
+                                                        </li>
+                                                    ) : (
+                                                        <li
+                                                            className={`cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b`}
+                                                            onClick={() => props.deleteAllItems(props.col.id)}
+                                                        >
+                                                            Delete All <MdDeleteSweep className="text-xl text-red-600" />
+                                                        </li>
+                                                    )
+                                                }
 
                                                 {
                                                     props.col.id == '1' || props.col.id == '2' || props.col.id == '3' ? (
@@ -225,7 +235,7 @@ function ColumnContainer(props: any) {
                     </div>
                 </div>
 
-                <div className='bg-transparent h-full w-full -z-10'></div>
+                <div className='bg-transparent h-full w-full -z-10 cursor-default'></div>
             </div>
 
 

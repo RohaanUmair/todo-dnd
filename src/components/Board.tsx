@@ -12,6 +12,7 @@ import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
 import { MdEmail } from 'react-icons/md';
+import { ClipLoader } from 'react-spinners';
 
 
 interface Column {
@@ -46,6 +47,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 console.log("Column data:", colSnap.data().data);
                 const colData = colSnap.data().data;
                 setCols(colData);
+                console.log('data get')
             } else {
                 console.log("No such document!");
                 setCols([{ title: 'To Do', id: 1 }, { title: 'In Progress', id: 2 }, { title: 'Done', id: 3 }]);
@@ -56,6 +58,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 const colData = doc.data()?.data;
                 setCols(colData);
                 setCheckCols(colData);
+                console.log('data get')
             });
             console.log(unsubCol);
 
@@ -68,6 +71,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 console.log("Task data:", docSnap.data().data);
                 const taskData = docSnap.data().data;
                 setTasks(taskData);
+                console.log('data get')
             } else {
                 console.log("No such document!");
                 setTasks([]);
@@ -80,6 +84,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 if (tasksData == undefined) return;
                 setTasks(tasksData);
                 setCheckTasks(tasksData);
+                console.log('data get')
             });
             console.log(unsubTask);
         }
@@ -93,8 +98,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
         if (checkCols == cols && checkTasks == tasks) return;
 
         addDataToDb(cols, tasks, userEmail as string);
-
-
+        console.log('data added')
     }, [tasks, cols]);
 
 
@@ -372,7 +376,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
 
     return (
-        <div className='overflow-y-hidden h-screen w-full bg-zinc-900'>
+        <div className='overflow-y-hidden h-screen w-full bg-zinc-900 relative'>
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
@@ -398,13 +402,27 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
 
                 <form className="flex justify-center items-center gap-5 w-screen pt-8" onSubmit={(e) => handleSubmit(e, input)}>
-                    <input
-                        className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200    max-md:w-24"
-                        placeholder="Type Something..."
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                    />
+                    {
+                        cols.length == 0 ? (
+                            <input
+                                className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200    max-md:w-24 cursor-not-allowed"
+                                placeholder="Type Something..."
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                disabled
+                            />
+
+                        ) : (
+                            <input
+                                className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200    max-md:w-24"
+                                placeholder="Type Something..."
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                        )
+                    }
 
                     <div className='flex items-center'>
                         <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded-l pl-2 bg-zinc-800 text-white text-sm" >
@@ -434,53 +452,62 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 collisionDetection={rectIntersection}
             >
                 <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3'>
-                    <SortableContext items={cols.map((col) => col.id)} >
-                        {cols.map((col) => (
-                            <div key={col.id}>
-                                <ColumnContainer updateTask={updateTask} editTask={editTask} editColTitle={editColTitle} deleteCol={deleteCol} deleteAllItems={deleteAllItems} deleteTask={deleteTask} col={col} addNewTask={addNewTask} tasks={tasks.filter((task) => task.colId == col.id)} />
-                            </div>
-                        ))}
-                    </SortableContext>
-                    <div className="h-fit flex flex-col mr-5">
-                        {
-                            showForm ? (
-                                <form
-                                    className='flex flex-col'
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handleNewCol();
-                                        setShowForm(!showForm);
-                                        setHeading('');
-                                    }}>
-                                    <input ref={inputColRef} type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus
-                                        onChange={(e) => setHeading(e.target.value)} />
-
-                                    <button ref={addColBtnRef} onClick={() => {
-                                        handleNewCol();
-                                        setHeading('');
-                                        setShowForm(!showForm);
-                                    }}
-                                        className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 ${showForm ? 'rounded-b' : 'rounded'}`}
-                                    >
-                                        {
-                                            showForm ? heading ? 'Add Card +' : 'Back' : 'New Card +'
-                                        }
-                                    </button>
-                                </form>
-                            ) : (
-                                <button onClick={() => {
-                                    handleNewCol();
-                                    setShowForm(!showForm);
-                                }}
-                                    className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 mr-12 ${showForm ? 'rounded-b' : 'rounded'}`}
-                                >
+                    {
+                        cols.length == 0 ? (
+                            <ClipLoader color='#fff' className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2' size={50} />
+                        ) : (
+                            <>
+                                <SortableContext items={cols.map((col) => col.id)} >
+                                    {cols.map((col) => (
+                                        <div key={col.id}>
+                                            <ColumnContainer updateTask={updateTask} editTask={editTask} editColTitle={editColTitle} deleteCol={deleteCol} deleteAllItems={deleteAllItems} deleteTask={deleteTask} col={col} addNewTask={addNewTask} tasks={tasks.filter((task) => task.colId == col.id)} />
+                                        </div>
+                                    ))}
+                                </SortableContext>
+                                <div className="h-fit flex flex-col mr-5">
                                     {
-                                        showForm ? heading ? 'Add Card +' : 'Back' : 'New Card +'
+                                        showForm ? (
+                                            <form
+                                                className='flex flex-col'
+                                                onSubmit={(e) => {
+                                                    e.preventDefault();
+                                                    handleNewCol();
+                                                    setShowForm(!showForm);
+                                                    setHeading('');
+                                                }}>
+                                                <input ref={inputColRef} type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus
+                                                    onChange={(e) => setHeading(e.target.value)} />
+
+                                                <button ref={addColBtnRef} onClick={() => {
+                                                    handleNewCol();
+                                                    setHeading('');
+                                                    setShowForm(!showForm);
+                                                }}
+                                                    className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 ${showForm ? 'rounded-b' : 'rounded'}`}
+                                                >
+                                                    {
+                                                        showForm ? heading ? 'Add Card +' : 'Back' : 'New Card +'
+                                                    }
+                                                </button>
+                                            </form>
+                                        ) : (
+                                            <button onClick={() => {
+                                                handleNewCol();
+                                                setShowForm(!showForm);
+                                            }}
+                                                className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 mr-12 ${showForm ? 'rounded-b' : 'rounded'}`}
+                                            >
+                                                {
+                                                    showForm ? heading ? 'Add Card +' : 'Back' : 'New Card +'
+                                                }
+                                            </button>
+                                        )
                                     }
-                                </button>
-                            )
-                        }
-                    </div>
+                                </div>
+                            </>
+
+                        )
+                    }
                 </div>
 
                 {
