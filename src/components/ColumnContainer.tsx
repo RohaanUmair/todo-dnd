@@ -110,118 +110,122 @@ function ColumnContainer(props: any) {
     return (
         <>
             <div
-                className={`w-60 bg-zinc-800 rounded pb-5 h-[350px] border border-zinc-950`}
+                className={`w-60 bg-zinc-800 pb-5 h-[350px]`}
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
             >
-                <div
-                    {...listeners}
-                    className="flex justify-between px-4 items-center py-3 border-b border-black bg-zinc-800 w-full rounded-t cursor-grab"
-                >
-                    {
-                        isEditingTitle ? (
-                            <form onSubmit={handleEditColTitle} className='flex items-center'>
-                                <input
-                                    type="text"
-                                    placeholder="Column Title"
-                                    className="rounded-t outline-none bg-zinc-800 w-36 text-white text-sm"
-                                    value={newTitle}
-                                    onChange={(e) => setNewTitle(e.target.value)}
-                                    onBlur={handleEditColTitle}
-                                    autoFocus
-                                />
-
-                                <div
-                                    className="h-6 w-6 bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer"
-                                >
-                                    <TiTick />
-                                </div>
-                            </form>
-                        ) : (
-                            props.col.title.length > 19 ? (
-                                <h3
-                                    className="text-white text-sm truncate"
-                                    data-tooltip-id="my-tooltip"
-                                    data-tooltip-content={props.col.title}
-                                >
-                                    {props.col.title}
-                                </h3>
-                            ) : (
-                                <h3 className="text-white text-sm truncate">{props.col.title}</h3>
-                            )
-                        )
-                    }
-                    <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
+                <div className='rounded border border-zinc-950'>
+                    <div
+                        {...listeners}
+                        className="flex justify-between px-4 items-center py-3 border-b border-black bg-zinc-800 w-full rounded-t cursor-grab"
+                    >
                         {
-                            openMenu ? (
-                                <div ref={menuRef}>
-                                    <IoClose className="text-lg" />
-                                    <div className="relative">
-                                        <ul className="absolute !w-36 top-4 text-sm right-0 bg-zinc-900 border rounded text-white p-2">
-                                            <li
-                                                className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
-                                                onClick={() => setIsEditingTitle(true)}
-                                            >
-                                                Edit <MdEdit className="text-xl text-yellow-400" />
-                                            </li>
+                            isEditingTitle ? (
+                                <form onSubmit={handleEditColTitle} className='flex items-center'>
+                                    <input
+                                        type="text"
+                                        placeholder="Column Title"
+                                        className="rounded-t outline-none bg-zinc-800 w-36 text-white text-sm"
+                                        value={newTitle}
+                                        onChange={(e) => setNewTitle(e.target.value)}
+                                        onBlur={handleEditColTitle}
+                                        autoFocus
+                                    />
 
-                                            <li
-                                                className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
-                                                onClick={() => props.deleteAllItems(props.col.id)}
-                                            >
-                                                Delete All <MdDeleteSweep className="text-xl text-red-600" />
-                                            </li>
-
-                                            {
-                                                props.col.id == '1' || props.col.id == '2' || props.col.id == '3' ? (
-                                                    <></>
-                                                ) : (
-                                                    <li
-                                                        className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1"
-                                                        onClick={() => props.deleteCol(props.col.title)}
-                                                    >
-                                                        Delete Column <MdDeleteForever className="text-xl text-red-800" />
-                                                    </li>
-
-                                                )
-                                            }
-                                        </ul>
+                                    <div
+                                        className="h-6 w-6 bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer"
+                                    >
+                                        <TiTick />
                                     </div>
-                                </div>
+                                </form>
                             ) : (
-                                <TbDots className="text-lg text-white" />
+                                props.col.title.length > 19 ? (
+                                    <h3
+                                        className="text-white text-sm truncate"
+                                        data-tooltip-id="my-tooltip"
+                                        data-tooltip-content={props.col.title}
+                                    >
+                                        {props.col.title}
+                                    </h3>
+                                ) : (
+                                    <h3 className="text-white text-sm truncate">{props.col.title}</h3>
+                                )
                             )
                         }
+                        <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
+                            {
+                                openMenu ? (
+                                    <div ref={menuRef}>
+                                        <IoClose className="text-lg" />
+                                        <div className="relative">
+                                            <ul className="absolute !w-36 top-4 text-sm right-0 bg-zinc-900 border rounded text-white p-2">
+                                                <li
+                                                    className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
+                                                    onClick={() => setIsEditingTitle(true)}
+                                                >
+                                                    Edit <MdEdit className="text-xl text-yellow-400" />
+                                                </li>
+
+                                                <li
+                                                    className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
+                                                    onClick={() => props.deleteAllItems(props.col.id)}
+                                                >
+                                                    Delete All <MdDeleteSweep className="text-xl text-red-600" />
+                                                </li>
+
+                                                {
+                                                    props.col.id == '1' || props.col.id == '2' || props.col.id == '3' ? (
+                                                        <></>
+                                                    ) : (
+                                                        <li
+                                                            className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1"
+                                                            onClick={() => props.deleteCol(props.col.title)}
+                                                        >
+                                                            Delete Column <MdDeleteForever className="text-xl text-red-800" />
+                                                        </li>
+
+                                                    )
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <TbDots className="text-lg text-white" />
+                                )
+                            }
+                        </div>
+                    </div>
+
+                    <div className={`max-h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
+                        <SortableContext items={props.tasks.map((task: any) => task.id)}>
+                            {props.tasks.length > 0 ? (
+                                props.tasks.map((task: any, index: number) => (
+                                    <Task updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
+                                ))
+                            ) : (
+                                <div
+                                    className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-4"
+                                >
+                                    Drag a task here or create a new one
+                                </div>
+                            )}
+                        </SortableContext>
+                    </div>
+
+                    <div className="flex justify-center mt-4">
+                        <div
+                            onClick={() => props.addNewTask(props.col.id)}
+                            className="w-full mx-auto h-10 border-2 border-black bg-black rounded-b flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
+                        >
+                            <h1 className=" font-bold flex items-center justify-between w-full">
+                                <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
+                            </h1>
+                        </div>
                     </div>
                 </div>
 
-                <div className={`h-[225px] overflow-x-hidden cursor-default ${isScrollable ? 'overflow-y-scroll' : ''}`}>
-                    <SortableContext items={props.tasks.map((task: any) => task.id)}>
-                        {props.tasks.length > 0 ? (
-                            props.tasks.map((task: any, index: number) => (
-                                <Task updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
-                            ))
-                        ) : (
-                            <div
-                                className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-4"
-                            >
-                                Drag a task here or create a new one
-                            </div>
-                        )}
-                    </SortableContext>
-                </div>
-
-                <div className="flex justify-center mt-4">
-                    <div
-                        onClick={() => props.addNewTask(props.col.id)}
-                        className="w-[80%] mx-auto h-10 border-2 border-black bg-black rounded flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
-                    >
-                        <h1 className=" font-bold flex items-center justify-between w-full">
-                            <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>
-                        </h1>
-                    </div>
-                </div>
+                <div className='bg-zinc-900 h-full w-full'></div>
             </div>
 
 
