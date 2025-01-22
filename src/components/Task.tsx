@@ -123,19 +123,25 @@ function Task(props: any) {
             className="bg-zinc-800 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
         >
             <>
-                {
-                    props.task.text.length > 13 ? (
-                        <p
-                            className="text-white text-sm font w-32 truncate "
-                            data-tooltip-id="my-tooltip"
-                            data-tooltip-content={props.task.text}
-                        >
-                            {props.task.text}
-                        </p>
-                    ) : (
-                        <p className="text-white text-sm font w-32 truncate">{props.task.text}</p>
-                    )
-                }
+                <div
+                    onClick={() => {
+                        props.handleModal(props.task)
+                    }}
+                >
+                    {
+                        props.task.text.length > 13 ? (
+                            <p
+                                className="text-white text-sm font w-32 truncate "
+                                data-tooltip-id="my-tooltip"
+                                data-tooltip-content={props.task.text}
+                            >
+                                {props.task.text}
+                            </p>
+                        ) : (
+                            <p className="text-white text-sm font w-32 truncate">{props.task.text}</p>
+                        )
+                    }
+                </div>
 
                 <div className="flex gap-1 cursor-default">
                     <div

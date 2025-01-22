@@ -211,7 +211,7 @@ function ColumnContainer(props: any) {
                         <SortableContext items={props.tasks.map((task: any) => task.id)}>
                             {props.tasks.length > 0 ? (
                                 props.tasks.map((task: any, index: number) => (
-                                    <Task updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
+                                    <Task handleModal={props.handleModal} updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
                                 ))
                             ) : (
                                 <div

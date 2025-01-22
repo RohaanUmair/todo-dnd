@@ -13,6 +13,8 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
 import { MdEmail } from 'react-icons/md';
 import { ClipLoader } from 'react-spinners';
+import { onDragStart } from './functions';
+import Modal from './modal/Modal';
 
 
 interface Column {
@@ -24,10 +26,14 @@ interface Task {
     id: number;
     colId: number;
     text: string;
+    desc: string;
+    comments: { commentId: number, commentText: string }[]
 }
 
 
 function Board({ userEmail }: { userEmail: string | null }) {
+    const [showModal, setShowModal] = useState<boolean>(false);
+
     const [cols, setCols] = useState<Column[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -96,7 +102,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
         if (checkCols == cols && checkTasks == tasks) return;
 
-        addDataToDb(cols, tasks, userEmail as string);
+        addDataToDb(cols, tasks, userEmail as string)
         console.log('data added')
     }, [tasks, cols]);
 
@@ -107,14 +113,18 @@ function Board({ userEmail }: { userEmail: string | null }) {
     );
 
 
-    const onDragStart = (e: DragStartEvent) => {
-        if (e.active.data.current?.type === 'Column') {
-            setActiveCol(e.active.data.current.column);
-        }
+    // const onDragStart = (e: DragStartEvent) => {
+    //     if (e.active.data.current?.type === 'Column') {
+    //         setActiveCol(e.active.data.current.column);
+    //     }
 
-        if (e.active.data.current?.type === 'Task') {
-            setActiveTask(e.active.data.current.task);
-        }
+    //     if (e.active.data.current?.type === 'Task') {
+    //         setActiveTask(e.active.data.current.task);
+    //     }
+    // }
+
+    const handleOnDragStart = (e: DragStartEvent) => {
+        onDragStart(e, setActiveCol, setActiveTask);
     }
 
     const onDragEnd = (e: DragEndEvent) => {
@@ -204,7 +214,9 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
     const addNewTask = (colId: number) => {
         const tasksInThisCol = tasks.filter((task) => task.colId === colId);
-        setTasks([...tasks, { id: Math.floor(Math.random() * 10000000), colId, text: `Task ${tasksInThisCol.length + 1}` }]);
+
+        const id = Math.floor(Math.random() * 10000000);
+        setTasks([...tasks, { id, colId, text: `Task ${tasksInThisCol.length + 1}`, desc: '', comments: [] }]);
     }
 
     const deleteTask = (taskId: number) => {
@@ -316,7 +328,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
         if (!input) return;
 
-        setTasks([...tasks, { id: Math.floor(Math.random() * 10000000), colId: parseInt(selected), text: input }]);
+        setTasks([...tasks, { id: Math.floor(Math.random() * 10000000), colId: parseInt(selected), text: input, desc: '', comments: [] }]);
         setInput('');
     }
 
@@ -374,13 +386,80 @@ function Board({ userEmail }: { userEmail: string | null }) {
     }, [showForm]);
 
 
+
+    interface ModalTypes {
+        modalHeading: string,
+        modalDesc: string,
+        modalComments: { commentId: number, commentText: string }[];
+        id: number | null;
+    }
+
+    const [modalDetails, setModalDetails] = useState<ModalTypes>(
+        {
+            modalHeading: '',
+            modalDesc: '',
+            modalComments: [],
+            id: null
+        }
+    );
+
+
+    const handleModal = (task: any) => {
+        setModalDetails({
+            modalHeading: task.text,
+            modalDesc: task.desc,
+            modalComments: task.comments,
+            id: task.id
+        })
+
+        setShowModal(true);
+    };
+
+    const handleAddComment = (id: number, newComment: string) => {
+        const uniqueId = Math.floor(Math.random() * 100000000);
+
+        setTasks(tasks.map((task) => task.id == id ? { ...task, comments: [...task.comments, { commentId: uniqueId, commentText: newComment }] } : task));
+        setModalDetails((prev) => {
+            return (
+                { ...prev, modalComments: [...prev.modalComments, { commentId: uniqueId, commentText: newComment }] }
+            )
+        })
+    };
+
+    const handleDelComment = (commentId: number, taskId: number) => {
+        let activeTask = tasks.filter((task) => task.id == taskId);
+        console.log(activeTask)
+
+        let abcd = activeTask[0].comments.filter((comment) => {
+            if (comment.commentId == commentId) {
+                return;
+            } else {
+                return comment;
+            }
+        })
+
+        activeTask = [{ ...activeTask[0], comments: abcd }]
+
+        console.log(activeTask);
+
+        setTasks(tasks.map((task) => task.id == taskId ? { ...task, comments: activeTask[0].comments } : task));
+
+        setModalDetails((prev) => {
+            return (
+                { ...prev, modalComments: activeTask[0].comments }
+            )
+        })
+    };
+
     return (
         <div className='overflow-y-hidden h-screen w-full bg-zinc-900 relative'>
+            {showModal && <Modal handleDelComment={handleDelComment} handleAddComment={handleAddComment} userEmail={userEmail as string} setShowModal={setShowModal} modalDetails={modalDetails} />}
+
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
                     <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile((prev) => !prev  )}>
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile((prev) => !prev)}>
                         {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
                     </button>
 
@@ -444,13 +523,13 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
 
             <DndContext
-                onDragStart={onDragStart}
+                onDragStart={handleOnDragStart}
                 onDragEnd={onDragEnd}
                 onDragOver={onDragOver}
                 sensors={sensors}
                 collisionDetection={rectIntersection}
             >
-                <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3'>
+                <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3 relative'>
                     {
                         cols.length == 0 || checkTasks == undefined ? (
                             <ClipLoader color='#fff' className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2' size={50} />
@@ -459,7 +538,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                 <SortableContext items={cols.map((col) => col.id)} >
                                     {cols.map((col) => (
                                         <div key={col.id}>
-                                            <ColumnContainer updateTask={updateTask} editTask={editTask} editColTitle={editColTitle} deleteCol={deleteCol} deleteAllItems={deleteAllItems} deleteTask={deleteTask} col={col} addNewTask={addNewTask} tasks={tasks.filter((task) => task.colId == col.id)} />
+                                            <ColumnContainer handleModal={handleModal} updateTask={updateTask} editTask={editTask} editColTitle={editColTitle} deleteCol={deleteCol} deleteAllItems={deleteAllItems} deleteTask={deleteTask} col={col} addNewTask={addNewTask} tasks={tasks.filter((task) => task.colId == col.id)} />
                                         </div>
                                     ))}
                                 </SortableContext>
