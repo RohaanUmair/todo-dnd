@@ -1,5 +1,4 @@
 import React from 'react';
-import { BiUser } from 'react-icons/bi';
 
 function RightBtn({ icon, text }: { icon: React.ReactNode, text: string }) {
     return (

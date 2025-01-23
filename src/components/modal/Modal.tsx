@@ -1,4 +1,4 @@
-import React, { Dispatch, MouseEventHandler, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { FiEye, FiUser } from 'react-icons/fi';
 import { GoNote } from 'react-icons/go';
 import { GrAttachment, GrList, GrTextAlignFull } from 'react-icons/gr';
@@ -11,6 +11,7 @@ import { IoIosArchive, IoMdAdd, IoMdCheckboxOutline, IoMdTime } from 'react-icon
 import { MdContentCopy, MdOutlineInput, MdVideoLabel } from 'react-icons/md';
 import { FaArrowRight } from 'react-icons/fa';
 import { CiShare2 } from 'react-icons/ci';
+import { RiDeleteBin2Fill } from 'react-icons/ri';
 
 interface Props {
     setShowModal: Dispatch<SetStateAction<boolean>>;
@@ -23,6 +24,8 @@ interface Props {
     userEmail: string;
     handleAddComment: (id: number, newComment: string) => void;
     handleDelComment: (commentId: number, taskId: number) => void;
+    handleAddDesc: (id: number, newDesc: string) => void;
+    handleDelDesc: (id: number) => void;
 }
 
 function Modal(props: Props) {
@@ -39,9 +42,25 @@ function Modal(props: Props) {
         setEditDesc(true);
     };
 
+    const modalRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            const a = modalRef?.current as any;
+            if (a && !a.contains(e?.target)) {
+                props.setShowModal((prev) => !prev);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    });
+
+
     return (
-        <div className='absolute w-full overflow-y-scroll h-full z-50 top-0 flex justify-center items-centr' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
-            <div className='text-[#b6c2cf] p-6 rounded-2xl w-[768px] min-h-[890px] max-h-full bg-[#323940] opacity-100 my-12 flex'>
+        <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center items-centr' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
+            <div ref={modalRef} className='text-[#b6c2cf] p-6 rounded-2xl w-[768px] min-h-[890px] max-h-full bg-[#323940] opacity-100 my-12 flex'>
 
                 <div className='w-[75%] flex flex-col gap-6'>
 
@@ -49,8 +68,8 @@ function Modal(props: Props) {
                         <GoNote className='text-2xl' />
 
                         <div className='ml-4'>
-                            <h1 className='text-xl mb-1'>{props.modalDetails.modalHeading}</h1>
-                            <h2 className='text-sm font-thin'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{props.modalDetails.modalHeading}</span></h2>
+                            <h1 className='text-xl mb-1 break-words w-[73%] max-h-40 overflow-y-auto'>{props.modalDetails.modalHeading}</h1>
+                            <h2 className='text-sm font-thin truncate max-w-32'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{props.modalDetails.modalHeading}</span></h2>
                         </div>
                     </div>
 
@@ -78,7 +97,12 @@ function Modal(props: Props) {
                                 description ? (
                                     <>
                                         <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                        <button className='bg-blue-800 px-3 py-1 rounded-sm'>Save</button>
+                                        <button
+                                            className='bg-blue-800 px-3 py-1 rounded-sm'
+                                            onClick={() => props.handleAddDesc(props.modalDetails.id as number, description)}
+                                        >
+                                            Save
+                                        </button>
                                     </>
                                 ) : (
                                     <>
@@ -90,13 +114,18 @@ function Modal(props: Props) {
                                 editDesc ? (
                                     description ? (
                                         <>
-                                            <textarea onBlur={() => {
-                                                setDescription(props.modalDetails.modalDesc);
-                                                setEditDesc(false);
-                                            }}
+                                            <textarea
                                                 autoFocus
                                                 className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                            <button className='bg-blue-800 px-3 py-1 rounded-sm'>Save</button>
+                                            <button
+                                                className='bg-blue-800 px-3 py-1 rounded-sm'
+                                                onClick={() => {
+                                                    props.handleAddDesc(props.modalDetails.id as number, description)
+                                                    setEditDesc(false);
+                                                }}
+                                            >
+                                                Save
+                                            </button>
                                         </>
                                     ) : (
                                         <>
@@ -106,8 +135,16 @@ function Modal(props: Props) {
                                     )
                                 ) : (
                                     <>
-                                        <div className='bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words'>{props.modalDetails.modalDesc}</div>
-                                        <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950 mt-2' onClick={toggleEditDescMode}>Edit</button>
+                                        <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${props.modalDetails.modalDesc.length > 170 ? "overflow-y-scroll" : ""}`}>{props.modalDetails.modalDesc}</div>
+                                        <div className='flex items-center'>
+                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950 mt-2' onClick={toggleEditDescMode}>Edit</button>
+                                            <button className='bg-red-800 px-3 py-[6px] rounded-sm mt-2 ml-2 text-xl' onClick={() => {
+                                                props.handleDelDesc(props.modalDetails.id as number);
+                                                setDescription('');
+                                            }}>
+                                                <RiDeleteBin2Fill />
+                                            </button>
+                                        </div>
                                     </>
                                 )
                             )}
@@ -138,7 +175,7 @@ function Modal(props: Props) {
                     </div>
 
 
-                    <div className={`ml-10 flex flex-col gap-2 relative ${props.modalDetails.modalComments.length > 5 ? "overflow-y-scroll" : ""}`}>
+                    <div className={`ml-10 flex flex-col gap-2 relative overflow-x-hidden ${props.modalDetails.modalComments.length > 5 ? "overflow-y-scroll" : ""}`}>
                         {
                             props.modalDetails.modalComments.map((comment, index) => {
                                 return (

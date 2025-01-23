@@ -364,7 +364,6 @@ function Board({ userEmail }: { userEmail: string | null }) {
     }, [openProfile]);
 
 
-
     const inputColRef = useRef(null);
     const addColBtnRef = useRef(null);
 
@@ -430,7 +429,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
         let activeTask = tasks.filter((task) => task.id == taskId);
         console.log(activeTask)
 
-        let abcd = activeTask[0].comments.filter((comment) => {
+        const abcd = activeTask[0].comments.filter((comment) => {
             if (comment.commentId == commentId) {
                 return;
             } else {
@@ -451,9 +450,28 @@ function Board({ userEmail }: { userEmail: string | null }) {
         })
     };
 
+    const handleAddDesc = (id: number, newDesc: string) => {
+        setTasks(tasks.map((task) => task.id == id ? { ...task, desc: newDesc } : task));
+        setModalDetails((prev) => {
+            return (
+                { ...prev, modalDesc: newDesc }
+            )
+        })
+    };
+
+    const handleDelDesc = (id: number) => {
+        setTasks(tasks.map((task) => task.id == id ? { ...task, desc: '' } : task));
+        setModalDetails((prev) => {
+            return (
+                { ...prev, modalDesc: '' }
+            )
+        })
+    };
+
+
     return (
         <div className='overflow-y-hidden h-screen w-full bg-zinc-900 relative'>
-            {showModal && <Modal handleDelComment={handleDelComment} handleAddComment={handleAddComment} userEmail={userEmail as string} setShowModal={setShowModal} modalDetails={modalDetails} />}
+            {showModal && <Modal handleDelDesc={handleDelDesc} handleAddDesc={handleAddDesc} handleDelComment={handleDelComment} handleAddComment={handleAddComment} userEmail={userEmail as string} setShowModal={setShowModal} modalDetails={modalDetails} />}
 
 
             <div className='fixed'>
@@ -470,9 +488,9 @@ function Board({ userEmail }: { userEmail: string | null }) {
                     {
                         openProfile && (
                             <div ref={profileRef} className='text-white w-fit h-fit absolute right-0 top-10 bg-zinc-600 px-2 rounded-b rounded-l     max-md:right-0'>
-                                <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded'><MdEmail className='absolute left-4 text-xl' /> {userEmail}</div>
+                                <div className='bg-zinc-800 px-2 flex items-center justify-center h-7 my-2 pl-10 text-sm rounded'><MdEmail className='absolute left-4 text-xl' /> {userEmail}</div>
 
-                                <div className='bg-zinc-800 px-2 flex items-center justify-center py-3 my-2 pl-10 rounded hover:bg-zinc-700 cursor-pointer' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
+                                <div className='bg-zinc-800 px-2 flex items-center justify-center h-7 my-2 pl-10 text-sm rounded hover:bg-zinc-700 cursor-pointer' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
                             </div>
                         )
                     }

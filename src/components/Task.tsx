@@ -25,41 +25,43 @@ function Task(props: any) {
 
     const [editMode, setEditMode] = useState<boolean>(false);
 
-    const [editTask, setEditTask] = useState<string>(props.task.text);
+    // const handleEditDone = () => {
+    //     // props.updateTask(props.task.id, editTask);
+    //     // setEditMode(!editMode);
 
-    const handleEditDone = () => {
-        // props.updateTask(props.task.id, editTask);
-        // setEditMode(!editMode);
+    //     if (editTask.trim() === props.task.text) {
+    //         setEditMode(false);
+    //         return;
+    //     }
 
-        if (editTask.trim() === props.task.text) {
-            setEditMode(false);
-            return;
-        }
+    //     if (editTask.trim() === '') {
+    //         setEditTask(props.task.text);
+    //     } else {
+    //         if (editTask.trim().length > 23) {
+    //             const arr = [];
 
-        if (editTask.trim() === '') {
-            setEditTask(props.task.text);
-        } else {
-            if (editTask.trim().length > 23) {
-                const arr = [];
+    //             for (let i = 0; i < editTask.trim().length; i++) {
+    //                 arr.push(editTask[i]);
+    //             }
 
-                for (let i = 0; i < editTask.trim().length; i++) {
-                    arr.push(editTask[i]);
-                }
+    //             for (let i = 0; i < arr.length / 23; i++) {
+    //                 if (i === 0) continue;
+    //                 arr.splice(22 * i + 1, 0, ' ');
+    //             }
 
-                for (let i = 0; i < arr.length / 23; i++) {
-                    if (i === 0) continue;
-                    arr.splice(22 * i + 1, 0, ' ');
-                }
+    //             const finalTask = arr.join('');
+    //             console.log(finalTask);
 
-                const finalTask = arr.join('');
-                console.log(finalTask);
+    //             props.updateTask(props.task.id, finalTask);
+    //         } else {
+    //             props.updateTask(props.task.id, editTask);
+    //         }
+    //     }
+    //     setEditMode(false);
+    // };
 
-                props.updateTask(props.task.id, finalTask);
-            } else {
-                props.updateTask(props.task.id, editTask);
-            }
-        }
-        setEditMode(false);
+    const toggleEditMode = () => {
+        setEditMode(!editMode);
     };
 
 
@@ -70,16 +72,20 @@ function Task(props: any) {
                     className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        handleEditDone();
+                        // handleEditDone();
+                        toggleEditMode();
                     }}
                 >
                     <input
                         type="text"
                         placeholder='Task'
                         className="outline-none w-32 bg-zinc-900 text-sm text-white"
-                        onChange={(e) => setEditTask(e.target.value)}
-                        value={editTask}
-                        onBlur={() => { handleEditDone() }}
+                        // onChange={(e) => setEditTask(e.target.value)}
+                        // value={editTask}
+                        // onBlur={() => { handleEditDone() }}
+                        onChange={(e) => props.updateTask(props.task.id, e.target.value)}
+                        value={props.task.text}
+                        onBlur={toggleEditMode}
                         autoFocus
                     />
 
@@ -161,7 +167,7 @@ function Task(props: any) {
                     </div>
                 </div>
 
-                <Tooltip id="my-tooltip" style={{ textWrap: 'wrap', width: 300, display: 'hidden' }} />
+                <Tooltip className='break-words' id="my-tooltip" style={{ textWrap: 'wrap', width: 300, display: 'hidden' }} />
             </>
         </div>
     )
