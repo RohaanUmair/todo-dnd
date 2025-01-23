@@ -8,7 +8,7 @@ import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
 import { BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
-import { onSnapshot } from 'firebase/firestore';
+// import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
 import { MdEmail } from 'react-icons/md';
