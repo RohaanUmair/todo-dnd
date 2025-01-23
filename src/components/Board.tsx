@@ -6,7 +6,7 @@ import { arrayMove, SortableContext } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
-import { BiMenu, BiPlus } from 'react-icons/bi';
+import { BiPlus } from 'react-icons/bi';
 import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
 import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';

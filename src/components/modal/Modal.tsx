@@ -11,7 +11,6 @@ import { IoIosArchive, IoMdAdd, IoMdCheckboxOutline, IoMdTime } from 'react-icon
 import { MdContentCopy, MdOutlineInput, MdVideoLabel } from 'react-icons/md';
 import { FaArrowRight } from 'react-icons/fa';
 import { CiShare2 } from 'react-icons/ci';
-import { RiDeleteBin2Fill } from 'react-icons/ri';
 
 interface Props {
     setShowModal: Dispatch<SetStateAction<boolean>>;
