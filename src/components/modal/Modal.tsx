@@ -60,9 +60,11 @@ function Modal(props: Props) {
 
     return (
         <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center items-centr' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
-            <div ref={modalRef} className='text-[#b6c2cf] p-6 rounded-2xl w-[768px] min-h-[890px] max-h-full bg-[#323940] opacity-100 my-12 flex'>
+            <div ref={modalRef} className='text-[#b6c2cf] relative p-6 rounded-2xl w-[768px] md:min-h-[890px] md:max-h-full bg-[#323940] opacity-100 my-12 flex        max-md:flex-col max-md:w-[80%] max-md:h-fit'>
 
-                <div className='w-[75%] flex flex-col gap-6'>
+                <IoClose className='absolute top-4 right-4 text-2xl hover:bg-zinc-600 cursor-pointer        md:hidden' onClick={() => props.setShowModal(prev => !prev)} />
+
+                <div className='w-[75%] flex flex-col gap-6     max-md:w-full'>
 
                     <div className='flex'>
                         <GoNote className='text-2xl' />
@@ -175,7 +177,7 @@ function Modal(props: Props) {
                     </div>
 
 
-                    <div className={`ml-10 flex flex-col gap-2 relative overflow-x-hidden ${props.modalDetails.modalComments.length > 5 ? "overflow-y-scroll" : ""}`}>
+                    <div className={`ml-10 flex flex-col gap-2 relative overflow-x-hidden       max-md:mb-5 ${props.modalDetails.modalComments.length > 5 ? "overflow-y-scroll" : ""}`}>
                         {
                             props.modalDetails.modalComments.map((comment, index) => {
                                 return (
@@ -197,10 +199,10 @@ function Modal(props: Props) {
                 </div>
 
 
-                <div className='w-[25%] pl-5 flex flex-col justify-end relative'>
-                    <IoClose className='absolute top-0 right-0 text-2xl hover:bg-zinc-600 cursor-pointer' onClick={() => props.setShowModal(prev => !prev)} />
+                <div className='w-[25%] pl-5 flex flex-col justify-end relative     max-md:w-full'>
+                    <IoClose className='absolute top-0 right-0 text-2xl hover:bg-zinc-600 cursor-pointer        max-md:hidden' onClick={() => props.setShowModal(prev => !prev)} />
 
-                    <div className='flex flex-col gap-2'>
+                    <div className='flex flex-col gap-2     max-md:flex-wrap max-md:flex-row'>
                         <RightBtn icon={<LuUserPlus />} text='Join' />
                         <RightBtn icon={<FiUser />} text='Members' />
                         <RightBtn icon={<CgTag style={{ rotate: '135deg' }} />} text='Labels' />
@@ -224,13 +226,13 @@ function Modal(props: Props) {
                     </div>
 
 
-                    <div className='flex flex-col gap-2'>
+                    <div className='flex flex-col gap-2     max-md:flex-wrap max-md:flex-row'>
                         <RightBtn icon={<FaArrowRight />} text='Move' />
                         <RightBtn icon={<MdContentCopy />} text='Copy' />
                         <RightBtn icon={<GoNote />} text='Mirror' />
                         <RightBtn icon={<MdOutlineInput />} text='Make Template' />
 
-                        <div className='w-full h-px bg-zinc-600'></div>
+                        <div className='w-full h-px bg-zinc-600     max-md:w-[92%]'></div>
 
                         <RightBtn icon={<IoIosArchive />} text='Archive' />
                         <RightBtn icon={<CiShare2 />} text='Share' />
