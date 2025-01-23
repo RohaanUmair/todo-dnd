@@ -15,6 +15,7 @@ import { MdEmail } from 'react-icons/md';
 import { ClipLoader } from 'react-spinners';
 import { onDragStart } from './functions';
 import Modal from './modal/Modal';
+import { FaUserCog } from 'react-icons/fa';
 
 
 interface Column {
@@ -97,15 +98,28 @@ function Board({ userEmail }: { userEmail: string | null }) {
         getData();
     }, []);
 
+    // useEffect(() => {
+    //     if (cols.length == 0) return;
+
+    //     if (checkCols == cols && checkTasks == tasks) return;
+
+    //     addDataToDb(cols, tasks, userEmail as string)
+    //     console.log('data added')
+    // }, [tasks, cols]);
+
     useEffect(() => {
         if (cols.length == 0) return;
 
         if (checkCols == cols && checkTasks == tasks) return;
 
-        addDataToDb(cols, tasks, userEmail as string)
-        console.log('data added')
-    }, [tasks, cols]);
+        if (!checkCols) return;
+        const unsub = setInterval(() => {
+            addDataToDb(cols, tasks, userEmail as string)
+            console.log('data added')
+        }, 1000);
 
+        return () => clearInterval(unsub);
+    });
 
 
     const sensors = useSensors(
@@ -482,7 +496,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                     </button>
 
                     <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800 md:hidden' onClick={() => setOpenProfile(!openProfile)}>
-                        <BiMenu className='text-3xl' />
+                        <FaUserCog className='text-3xl' />
                     </button>
 
                     {

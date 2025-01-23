@@ -59,7 +59,7 @@ function Modal(props: Props) {
 
 
     return (
-        <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center items-centr' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
+        <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
             <div ref={modalRef} className='text-[#b6c2cf] relative p-6 rounded-2xl w-[768px] md:min-h-[890px] md:max-h-full bg-[#323940] opacity-100 my-12 flex        max-md:flex-col max-md:w-[80%] max-md:h-fit'>
 
                 <IoClose className='absolute top-4 right-4 text-2xl hover:bg-zinc-600 cursor-pointer        md:hidden' onClick={() => props.setShowModal(prev => !prev)} />
@@ -69,8 +69,8 @@ function Modal(props: Props) {
                     <div className='flex'>
                         <GoNote className='text-2xl' />
 
-                        <div className='ml-4'>
-                            <h1 className='text-xl mb-1 break-words w-[73%] max-h-40 overflow-y-auto'>{props.modalDetails.modalHeading}</h1>
+                        <div className='ml-4 w-[87%]'>
+                            <h1 className='text-xl mb-1 break-words w-full max-h-40 overflow-y-auto'>{props.modalDetails.modalHeading}</h1>
                             <h2 className='text-sm font-thin truncate max-w-32'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{props.modalDetails.modalHeading}</span></h2>
                         </div>
                     </div>
@@ -139,13 +139,11 @@ function Modal(props: Props) {
                                     <>
                                         <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${props.modalDetails.modalDesc.length > 170 ? "overflow-y-scroll" : ""}`}>{props.modalDetails.modalDesc}</div>
                                         <div className='flex items-center'>
-                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950 mt-2' onClick={toggleEditDescMode}>Edit</button>
-                                            <button className='bg-red-800 px-3 py-[6px] rounded-sm mt-2 ml-2 text-xl' onClick={() => {
+                                            <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={toggleEditDescMode}><LuDot className='text-xl' />Edit</p>
+                                            <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => {
                                                 props.handleDelDesc(props.modalDetails.id as number);
                                                 setDescription('');
-                                            }}>
-                                                <RiDeleteBin2Fill />
-                                            </button>
+                                            }}><LuDot className='text-xl' />Delete</p>
                                         </div>
                                     </>
                                 )
@@ -199,7 +197,7 @@ function Modal(props: Props) {
                 </div>
 
 
-                <div className='w-[25%] pl-5 flex flex-col justify-end relative     max-md:w-full'>
+                <div className='w-[25%] pl-5 flex flex-col justify-end relative     max-md:pl-0 max-md:w-full'>
                     <IoClose className='absolute top-0 right-0 text-2xl hover:bg-zinc-600 cursor-pointer        max-md:hidden' onClick={() => props.setShowModal(prev => !prev)} />
 
                     <div className='flex flex-col gap-2     max-md:flex-wrap max-md:flex-row'>
