@@ -38,8 +38,8 @@ function Board({ userEmail }: { userEmail: string | null }) {
     const [cols, setCols] = useState<Column[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    const [checkCols, setCheckCols] = useState<Column[]>();
-    const [checkTasks, setCheckTasks] = useState<Task[]>();
+    // const [checkCols, setCheckCols] = useState<Column[]>();
+    // const [checkTasks, setCheckTasks] = useState<Task[]>();
 
     const [activeCol, setActiveCol] = useState<Column | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -59,14 +59,14 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 setCols([{ title: 'To Do', id: 1 }, { title: 'In Progress', id: 2 }, { title: 'Done', id: 3 }]);
             }
 
-            const unsubCol = onSnapshot(doc(db, "columns", userEmail as string), (doc) => {
-                console.log("Current data: ", doc.data()?.data);
-                const colData = doc.data()?.data;
-                setCols(colData);
-                setCheckCols(colData);
-                console.log('data get')
-            });
-            console.log(unsubCol);
+            // const unsubCol = onSnapshot(doc(db, "columns", userEmail as string), (doc) => {
+            //     console.log("Current data: ", doc.data()?.data);
+            //     const colData = doc.data()?.data;
+            //     setCols(colData);
+            //     setCheckCols(colData);
+            //     console.log('data get')
+            // });
+            // console.log(unsubCol);
 
 
 
@@ -83,43 +83,43 @@ function Board({ userEmail }: { userEmail: string | null }) {
                 setTasks([]);
             }
 
-            const unsubTask = onSnapshot(doc(db, "tasks", userEmail as string), (doc) => {
-                console.log("Current data: ", doc.data()?.data);
-                const tasksData = doc.data()?.data;
+            // const unsubTask = onSnapshot(doc(db, "tasks", userEmail as string), (doc) => {
+            //     console.log("Current data: ", doc.data()?.data);
+            //     const tasksData = doc.data()?.data;
 
-                if (tasksData == undefined) return;
-                setTasks(tasksData);
-                setCheckTasks(tasksData);
-                console.log('data get')
-            });
-            console.log(unsubTask);
+            //     if (tasksData == undefined) return;
+            //     setTasks(tasksData);
+            //     setCheckTasks(tasksData);
+            //     console.log('data get')
+            // });
+            // console.log(unsubTask);
         }
 
         getData();
     }, []);
+
+    useEffect(() => {
+        if (cols.length == 0) return;
+
+        // if (checkCols == cols && checkTasks == tasks) return;
+
+        addDataToDb(cols, tasks, userEmail as string)
+        console.log('data added')
+    }, [tasks, cols]);
 
     // useEffect(() => {
     //     if (cols.length == 0) return;
 
     //     if (checkCols == cols && checkTasks == tasks) return;
 
-    //     addDataToDb(cols, tasks, userEmail as string)
-    //     console.log('data added')
-    // }, [tasks, cols]);
+    //     if (!checkCols) return;
+    //     const unsub = setInterval(() => {
+    //         addDataToDb(cols, tasks, userEmail as string)
+    //         console.log('data added')
+    //     }, 1000);
 
-    useEffect(() => {
-        if (cols.length == 0) return;
-
-        if (checkCols == cols && checkTasks == tasks) return;
-
-        if (!checkCols) return;
-        const unsub = setInterval(() => {
-            addDataToDb(cols, tasks, userEmail as string)
-            console.log('data added')
-        }, 1000);
-
-        return () => clearInterval(unsub);
-    });
+    //     return () => clearInterval(unsub);
+    // });
 
 
     const sensors = useSensors(
@@ -563,7 +563,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
             >
                 <div className='flex items-start pt-12 h-full w-full justify-start px-10 mt-36 gap-3 relative'>
                     {
-                        cols.length == 0 || checkTasks == undefined ? (
+                        cols.length == 0 ? (
                             <ClipLoader color='#fff' className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2' size={50} />
                         ) : (
                             <>
