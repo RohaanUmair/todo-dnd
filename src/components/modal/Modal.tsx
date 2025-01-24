@@ -129,13 +129,13 @@ function Modal(props: Props) {
                                             className='bg-blue-800 px-3 py-1 rounded-sm'
                                             onClick={() => props.handleAddDesc(props.modalDetails.id as number, description)}
                                         >
-                                            Save1
+                                            Save
                                         </button>
                                     </>
                                 ) : (
                                     <>
                                         <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                        <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save2</button>
+                                        <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
                                     </>
                                 )
                             ) : (
@@ -152,13 +152,13 @@ function Modal(props: Props) {
                                                     setEditDesc(false);
                                                 }}
                                             >
-                                                Save3
+                                                Save
                                             </button>
                                         </>
                                     ) : (
                                         <>
                                             <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save4</button>
+                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
                                         </>
                                     )
                                 ) : (
