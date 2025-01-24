@@ -120,7 +120,7 @@ function Modal(props: Props) {
                             {props.modalDetails.modalDesc == '' ? (
                                 description ? (
                                     <>
-                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
+                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
                                         <button
                                             className='bg-blue-800 px-3 py-1 rounded-sm'
                                             onClick={() => props.handleAddDesc(props.modalDetails.id as number, description)}
@@ -130,7 +130,7 @@ function Modal(props: Props) {
                                     </>
                                 ) : (
                                     <>
-                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
+                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
                                         <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
                                     </>
                                 )
