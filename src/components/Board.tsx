@@ -30,7 +30,7 @@ interface Task {
     colId: number;
     text: string;
     desc: string;
-    comments: { commentId: number, commentText: string }[]
+    comments: { commentId: number, commentText: string }[];
 }
 
 

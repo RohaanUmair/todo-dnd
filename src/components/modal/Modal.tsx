@@ -77,6 +77,10 @@ function Modal(props: Props) {
         
     }, [props.tasks]);
 
+    useEffect(() => {
+        setDescription(task?.desc as string)
+    }, [task]);
+
 
     return (
         <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
@@ -117,7 +121,7 @@ function Modal(props: Props) {
                         <Heading text='Description' icon={<GrTextAlignFull />} />
 
                         <div className='ml-10 mt-1'>
-                            {props.modalDetails.modalDesc == '' ? (
+                            {task?.desc == '' ? (
                                 description ? (
                                     <>
                                         <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
@@ -125,13 +129,13 @@ function Modal(props: Props) {
                                             className='bg-blue-800 px-3 py-1 rounded-sm'
                                             onClick={() => props.handleAddDesc(props.modalDetails.id as number, description)}
                                         >
-                                            Save
+                                            Save1
                                         </button>
                                     </>
                                 ) : (
                                     <>
                                         <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                        <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
+                                        <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save2</button>
                                     </>
                                 )
                             ) : (
@@ -148,19 +152,19 @@ function Modal(props: Props) {
                                                     setEditDesc(false);
                                                 }}
                                             >
-                                                Save
+                                                Save3
                                             </button>
                                         </>
                                     ) : (
                                         <>
                                             <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
-                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
+                                            <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save4</button>
                                         </>
                                     )
                                 ) : (
                                     <>
                                         {/* <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${props.modalDetails.modalDesc.length > 170 ? "overflow-y-scroll" : ""}`}>{props.modalDetails.modalDesc}</div> */}
-                                        <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${task?.desc?.length as number > 170 ? "overflow-y-scroll" : ""}`}>{task?.desc as string}</div>
+                                        <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${task?.desc?.length as number > 170 ? "overflow-y-scroll" : ""}`}><p>{task?.desc as string}</p></div>
                                         <div className='flex items-center'>
                                             <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={toggleEditDescMode}><LuDot className='text-xl' />Edit</p>
                                             <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => {
