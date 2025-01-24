@@ -72,7 +72,7 @@ function Modal(props: Props) {
     }>();
 
     useEffect(() => {
-        let [a] = props.tasks.filter((task) => task.id == props.modalDetails.id);
+        const [a] = props.tasks.filter((task) => task.id == props.modalDetails.id);
         setTask(a);
         
     }, [props.tasks]);
