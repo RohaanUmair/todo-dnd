@@ -44,7 +44,7 @@ function Modal(props: Props) {
     const [editDesc, setEditDesc] = useState<boolean>(false);
 
     const toggleEditDescMode = () => {
-        setDescription(props.modalDetails.modalDesc);
+        setDescription(task?.desc as string);
         setEditDesc(true);
     };
 
