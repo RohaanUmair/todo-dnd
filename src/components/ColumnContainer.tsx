@@ -40,6 +40,25 @@ function ColumnContainer(props: any) {
     const [isEditingTitle, setIsEditingTitle] = useState<boolean>(false);
     const [newTitle, setNewTitle] = useState<string>(props.col.title);
 
+    const inputRef = useRef(null);
+    const btnRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (!isEditingTitle) return;
+
+            const a = inputRef?.current as any;
+            const b = btnRef?.current as any;
+            if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
+                setIsEditingTitle(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isEditingTitle]);
+
     const handleEditColTitle = () => {
         if (newTitle.trim() === props.col.title) {
             setIsEditingTitle(false);
@@ -124,16 +143,18 @@ function ColumnContainer(props: any) {
                             isEditingTitle ? (
                                 <form onSubmit={handleEditColTitle} className='flex items-center'>
                                     <input
+                                        ref={inputRef}
                                         type="text"
                                         placeholder="Column Title"
                                         className="rounded-t outline-none bg-zinc-800 w-36 text-white text-sm"
                                         value={newTitle}
                                         onChange={(e) => setNewTitle(e.target.value)}
-                                        onBlur={handleEditColTitle}
                                         autoFocus
                                     />
 
                                     <div
+                                        ref={btnRef}
+                                        onClick={handleEditColTitle}
                                         className="h-6 w-6 bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer"
                                     >
                                         <TiTick />
@@ -215,7 +236,7 @@ function ColumnContainer(props: any) {
                                 ))
                             ) : (
                                 <div
-                                    className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-4"
+                                    className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-2"
                                 >
                                     Drag a task here or create a new one
                                 </div>

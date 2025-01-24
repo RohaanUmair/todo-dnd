@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MdDeleteForever, MdEdit } from 'react-icons/md';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -24,46 +24,66 @@ function Task(props: any) {
 
 
     const [editMode, setEditMode] = useState<boolean>(false);
+    const [editTask, setEditTask] = useState<string>('');
 
-    // const handleEditDone = () => {
-    //     // props.updateTask(props.task.id, editTask);
-    //     // setEditMode(!editMode);
+    useEffect(() => {
+        setEditTask(props.task.text);
+    }, [editMode])
 
-    //     if (editTask.trim() === props.task.text) {
-    //         setEditMode(false);
-    //         return;
-    //     }
 
-    //     if (editTask.trim() === '') {
-    //         setEditTask(props.task.text);
-    //     } else {
-    //         if (editTask.trim().length > 23) {
-    //             const arr = [];
+    const handleEditDone = () => {
+        // props.updateTask(props.task.id, editTask);
+        // setEditMode(!editMode);
 
-    //             for (let i = 0; i < editTask.trim().length; i++) {
-    //                 arr.push(editTask[i]);
-    //             }
+        if (editTask.trim() === props.task.text) {
+            setEditMode(false);
+            return;
+        }
 
-    //             for (let i = 0; i < arr.length / 23; i++) {
-    //                 if (i === 0) continue;
-    //                 arr.splice(22 * i + 1, 0, ' ');
-    //             }
+        if (editTask.trim() === '') {
+            setEditTask(props.task.text);
+        } else {
+            if (editTask.trim().length > 23) {
+                const arr = [];
 
-    //             const finalTask = arr.join('');
-    //             console.log(finalTask);
+                for (let i = 0; i < editTask.trim().length; i++) {
+                    arr.push(editTask[i]);
+                }
 
-    //             props.updateTask(props.task.id, finalTask);
-    //         } else {
-    //             props.updateTask(props.task.id, editTask);
-    //         }
-    //     }
-    //     setEditMode(false);
-    // };
+                for (let i = 0; i < arr.length / 23; i++) {
+                    if (i === 0) continue;
+                    arr.splice(22 * i + 1, 0, ' ');
+                }
 
-    const toggleEditMode = () => {
-        setEditMode(!editMode);
+                const finalTask = arr.join('');
+                console.log(finalTask);
+
+                props.updateTask(props.task.id, finalTask);
+            } else {
+                props.updateTask(props.task.id, editTask);
+            }
+        }
+        setEditMode(false);
     };
 
+    const inputRef = useRef(null);
+    const btnRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (!editMode) return;
+
+            const a = inputRef?.current as any;
+            const b = btnRef?.current as any;
+            if (a && !a.contains(e?.target) && b && !b.contains(e?.target)) {
+                setEditMode(false);
+            }
+        }
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [editMode]);
 
     if (editMode) {
         return (
@@ -72,25 +92,21 @@ function Task(props: any) {
                     className="bg-zinc-900 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
                     onSubmit={(e) => {
                         e.preventDefault();
-                        // handleEditDone();
-                        toggleEditMode();
+                        handleEditDone();
                     }}
                 >
                     <input
+                        ref={inputRef}
                         type="text"
                         placeholder='Task'
                         className="outline-none w-32 bg-zinc-900 text-sm text-white"
-                        // onChange={(e) => setEditTask(e.target.value)}
-                        // value={editTask}
-                        // onBlur={() => { handleEditDone() }}
-                        onChange={(e) => props.updateTask(props.task.id, e.target.value)}
-                        value={props.task.text}
-                        onBlur={toggleEditMode}
+                        onChange={(e) => setEditTask(e.target.value)}
+                        value={editTask}
                         autoFocus
                     />
 
-                    <div className="flex gap-1 cursor-default">
-                        <div className="h-6 w-6 shadow bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer">
+                    <div className="flex gap-1 cursor-default" ref={btnRef}>
+                        <div className="h-6 w-6 shadow bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer" onClick={ () => handleEditDone() }>
                             <TiTick />
                         </div>
                     </div>

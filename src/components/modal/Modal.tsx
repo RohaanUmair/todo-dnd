@@ -25,6 +25,13 @@ interface Props {
     handleDelComment: (commentId: number, taskId: number) => void;
     handleAddDesc: (id: number, newDesc: string) => void;
     handleDelDesc: (id: number) => void;
+    tasks: {
+        id: number;
+        colId: number;
+        text: string;
+        desc: string;
+        comments: { commentId: number, commentText: string }[]
+    }[]
 }
 
 function Modal(props: Props) {
@@ -56,6 +63,20 @@ function Modal(props: Props) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     });
 
+    const [task, setTask] = useState< {
+        id: number;
+        colId: number;
+        text: string;
+        desc: string;
+        comments: { commentId: number, commentText: string }[]
+    }>();
+
+    useEffect(() => {
+        let [a] = props.tasks.filter((task) => task.id == props.modalDetails.id);
+        setTask(a);
+        
+    }, [props.tasks]);
+
 
     return (
         <div className='fixed w-full overflow-y-scroll h-full z-50 top-0 flex justify-center' style={{ backgroundColor: 'rgb(0, 0, 0, 0.9)' }}>
@@ -69,8 +90,10 @@ function Modal(props: Props) {
                         <GoNote className='text-2xl' />
 
                         <div className='ml-4 w-[87%]'>
-                            <h1 className='text-xl mb-1 break-words w-full max-h-40 overflow-y-auto'>{props.modalDetails.modalHeading}</h1>
-                            <h2 className='text-sm font-thin truncate max-w-32'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{props.modalDetails.modalHeading}</span></h2>
+                            {/* <h1 className='text-xl mb-1 break-words w-full max-h-40 overflow-y-auto'>{props.modalDetails.modalHeading}</h1> */}
+                            <h1 className='text-xl mb-1 break-words w-full max-h-40 overflow-y-auto'>{task?.text}</h1>
+                            {/* <h2 className='text-sm font-thin truncate max-w-32'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{props.modalDetails.modalHeading}</span></h2> */}
+                            <h2 className='text-sm font-thin truncate max-w-32'>in list <span className='px-1 rounded-sm font-normal bg-[#3c454d]'>{task?.text}</span></h2>
                         </div>
                     </div>
 
@@ -97,7 +120,7 @@ function Modal(props: Props) {
                             {props.modalDetails.modalDesc == '' ? (
                                 description ? (
                                     <>
-                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
                                         <button
                                             className='bg-blue-800 px-3 py-1 rounded-sm'
                                             onClick={() => props.handleAddDesc(props.modalDetails.id as number, description)}
@@ -107,7 +130,7 @@ function Modal(props: Props) {
                                     </>
                                 ) : (
                                     <>
-                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+                                        <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
                                         <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
                                     </>
                                 )
@@ -130,13 +153,14 @@ function Modal(props: Props) {
                                         </>
                                     ) : (
                                         <>
-                                            <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+                                            <textarea className='bg-[#3c454d] outline-none px-3 pt-2 pb-8 text-sm font-semibold w-full rounded resize-none' placeholder='Add more detailed description...' value={task?.desc} onChange={(e) => setDescription(e.target.value)}></textarea>
                                             <button className='bg-blue-800 px-3 py-1 rounded-sm disabled:bg-blue-950' disabled>Save</button>
                                         </>
                                     )
                                 ) : (
                                     <>
-                                        <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${props.modalDetails.modalDesc.length > 170 ? "overflow-y-scroll" : ""}`}>{props.modalDetails.modalDesc}</div>
+                                        {/* <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${props.modalDetails.modalDesc.length > 170 ? "overflow-y-scroll" : ""}`}>{props.modalDetails.modalDesc}</div> */}
+                                        <div className={`bg-[#3c454d] outline-none px-3 py-2 text-sm font-semibold w-full rounded break-words max-h-28 ${task?.desc?.length as number > 170 ? "overflow-y-scroll" : ""}`}>{task?.desc as string}</div>
                                         <div className='flex items-center'>
                                             <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={toggleEditDescMode}><LuDot className='text-xl' />Edit</p>
                                             <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => {
@@ -175,20 +199,42 @@ function Modal(props: Props) {
 
 
                     <div className={`ml-10 flex flex-col gap-2 relative overflow-x-hidden       max-md:mb-5 ${props.modalDetails.modalComments.length > 5 ? "overflow-y-scroll" : ""}`}>
-                        {
+                        {/* {
                             props.modalDetails.modalComments.map((comment, index) => {
-                                return (
-                                    <div key={index}>
-                                        <div className='flex gap-2'>
-                                            <div className='absolute w-10 h-10 bg-orange-700 rounded-full flex justify-center items-center text-2xl font-semibold'>{props.userEmail.slice(0, 1).toUpperCase()}</div>
-                                            <div className='bg-zinc-800 translate-x-12 outline-none px-3 py-2 text-sm w-[420px] rounded text-wrap break-words '>{comment.commentText}</div>
+                                if (comment.commentId == 123) {
+                                    return;
+                                } else {
+                                    return (
+                                        <div key={index}>
+                                            <div className='flex gap-2'>
+                                                <div className='absolute w-10 h-10 bg-orange-700 rounded-full flex justify-center items-center text-2xl font-semibold'>{props.userEmail.slice(0, 1).toUpperCase()}</div>
+                                                <div className='bg-zinc-800 translate-x-12 outline-none px-3 py-2 text-sm w-[420px] rounded text-wrap break-words '>{comment.commentText}</div>
+                                            </div>
+                                            <div className='flex translate-x-11'>
+                                                <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => props.handleDelComment(comment.commentId, props.modalDetails.id as number)}><LuDot className='text-xl' />Delete</p>
+                                            </div>
                                         </div>
-                                        <div className='flex translate-x-11'>
-                                            {/* <p className='text-[11px] flex items-center cursor-pointer hover:underline'><LuDot className='text-xl' />Edit</p> */}
-                                            <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => props.handleDelComment(comment.commentId, props.modalDetails.id as number)}><LuDot className='text-xl' />Delete</p>
+                                    )
+                                }
+                            })
+                        } */}
+                         {
+                            task?.comments.map((comment, index) => {
+                                if (comment.commentId == 123) {
+                                    return;
+                                } else {
+                                    return (
+                                        <div key={index}>
+                                            <div className='flex gap-2'>
+                                                <div className='absolute w-10 h-10 bg-orange-700 rounded-full flex justify-center items-center text-2xl font-semibold'>{props.userEmail.slice(0, 1).toUpperCase()}</div>
+                                                <div className='bg-zinc-800 translate-x-12 outline-none px-3 py-2 text-sm w-[420px] rounded text-wrap break-words '>{comment.commentText}</div>
+                                            </div>
+                                            <div className='flex translate-x-11'>
+                                                <p className='text-[11px] flex items-center cursor-pointer hover:underline' onClick={() => props.handleDelComment(comment.commentId, props.modalDetails.id as number)}><LuDot className='text-xl' />Delete</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                )
+                                    )
+                                }
                             })
                         }
                     </div>

@@ -5,6 +5,20 @@ import { useState } from 'react';
 import { SyncLoader } from 'react-spinners';
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '@/lib/firebase';
 import toast, { Toaster } from 'react-hot-toast';
+import { getDatabase, ref, set } from 'firebase/database';
+
+interface Column {
+    title: string;
+    id: number;
+}
+
+interface Task {
+    id: number;
+    colId: number;
+    text: string;
+    desc: string;
+    comments: { commentId: number, commentText: string }[]
+}
 
 function AuthPage() {
     const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
@@ -18,6 +32,30 @@ function AuthPage() {
             resetForm({ values: { signupEmail: '', signupPassword: '', signupUsername: '' } });
         }
     };
+
+
+    function correctEmail(email: string): string {
+        return email.replace(/\./g, ',');
+    }
+
+    async function addDataToDb(colData: Column[], taskData: Task[], email: string) {
+        const encodedEmail = correctEmail(email);
+        const db = getDatabase();
+
+        try {
+            await set(ref(db, `columns/${encodedEmail}`), colData);
+            console.log("Columns added successfully");
+        } catch (error) {
+            console.error("Error adding columns: ", error);
+        }
+
+        try {
+            await set(ref(db, `tasks/${encodedEmail}`), taskData);
+            console.log("Tasks added successfully", taskData);
+        } catch (error) {
+            console.error("Error adding tasks: ", error);
+        }
+    }
 
 
     return (
@@ -119,6 +157,11 @@ function AuthPage() {
                     setTimeout(() => {
                         createUserWithEmailAndPassword(auth, values.signupEmail, values.signupPassword)
                             .then((userCredential) => {
+                                addDataToDb([
+                                    { title: "To Do", id: 1 },
+                                    { title: "In Progress", id: 2 },
+                                    { title: "Done", id: 3 },
+                                ], [], values.signupEmail);
                                 const user = userCredential.user;
                                 console.log('account created', user);
                                 setSubmitting(false);

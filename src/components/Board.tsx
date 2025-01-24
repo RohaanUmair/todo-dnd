@@ -7,8 +7,8 @@ import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
 import { BiPlus } from 'react-icons/bi';
-import { addDataToDb, db, doc, getDoc, handleSignout } from '@/lib/firebase';
-// import { onSnapshot } from 'firebase/firestore';
+import { db, doc, getDoc, handleSignout } from '@/lib/firebase';
+import { onSnapshot } from 'firebase/firestore';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
 import { MdEmail } from 'react-icons/md';
@@ -16,6 +16,9 @@ import { ClipLoader } from 'react-spinners';
 import { onDragStart } from './functions';
 import Modal from './modal/Modal';
 import { FaUserCog } from 'react-icons/fa';
+import { getDatabase, ref, set, onValue, get } from "firebase/database";
+import Swal from 'sweetalert2';
+
 
 
 interface Column {
@@ -38,88 +41,108 @@ function Board({ userEmail }: { userEmail: string | null }) {
     const [cols, setCols] = useState<Column[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    // const [checkCols, setCheckCols] = useState<Column[]>();
-    // const [checkTasks, setCheckTasks] = useState<Task[]>();
+    const [checkCols, setCheckCols] = useState<Column[]>();
+    const [checkTasks, setCheckTasks] = useState<Task[]>();
 
     const [activeCol, setActiveCol] = useState<Column | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-    useEffect(() => {
-        async function getData() {
-            const colRef = doc(db, "columns", userEmail as string);
-            const colSnap = await getDoc(colRef);
+    function correctEmail(email: string): string {
+        return email.replace(/\./g, ',');
+    }
 
-            if (colSnap.exists()) {
-                console.log("Column data:", colSnap.data().data);
-                const colData = colSnap.data().data;
-                setCols(colData);
-                console.log('data get')
-            } else {
-                console.log("No such document!");
-                setCols([{ title: 'To Do', id: 1 }, { title: 'In Progress', id: 2 }, { title: 'Done', id: 3 }]);
-            }
+    async function addDataToDb(colData: Column[], taskData: Task[], email: string) {
+        const encodedEmail = correctEmail(email);
+        const db = getDatabase();
 
-            // const unsubCol = onSnapshot(doc(db, "columns", userEmail as string), (doc) => {
-            //     console.log("Current data: ", doc.data()?.data);
-            //     const colData = doc.data()?.data;
-            //     setCols(colData);
-            //     setCheckCols(colData);
-            //     console.log('data get')
-            // });
-            // console.log(unsubCol);
-
-
-
-            const taskRef = doc(db, "tasks", userEmail as string);
-            const docSnap = await getDoc(taskRef);
-
-            if (docSnap.exists()) {
-                console.log("Task data:", docSnap.data().data);
-                const taskData = docSnap.data().data;
-                setTasks(taskData);
-                console.log('data get')
-            } else {
-                console.log("No such document!");
-                setTasks([]);
-            }
-
-            // const unsubTask = onSnapshot(doc(db, "tasks", userEmail as string), (doc) => {
-            //     console.log("Current data: ", doc.data()?.data);
-            //     const tasksData = doc.data()?.data;
-
-            //     if (tasksData == undefined) return;
-            //     setTasks(tasksData);
-            //     setCheckTasks(tasksData);
-            //     console.log('data get')
-            // });
-            // console.log(unsubTask);
+        try {
+            await set(ref(db, `columns/${encodedEmail}`), colData);
+            console.log("Columns added successfully");
+        } catch (error) {
+            console.error("Error adding columns: ", error);
         }
 
-        getData();
-    }, []);
+        try {
+            await set(ref(db, `tasks/${encodedEmail}`), taskData);
+            console.log("Tasks added successfully", taskData);
+        } catch (error) {
+            console.error("Error adding tasks: ", error);
+        }
+    }
+
+    const [getData, setGetdata] = useState<boolean>(false);
 
     useEffect(() => {
-        if (cols.length == 0) return;
+        if (!userEmail) return;
 
-        // if (checkCols == cols && checkTasks == tasks) return;
+        const encodedEmail = correctEmail(userEmail);
+        const db = getDatabase();
+        const colRef = ref(db, `columns/${encodedEmail}`);
+        const taskRef = ref(db, `tasks/${encodedEmail}`);
 
-        addDataToDb(cols, tasks, userEmail as string)
-        console.log('data added')
+        get(colRef).then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("Column data:", data);
+                setCols(data);
+                setCheckCols(data);
+            }
+            // else {
+            //     console.log("No columns found, setting default.");
+            //     const defaultCols = [
+            //         { title: "To Do", id: 1 },
+            //         { title: "In Progress", id: 2 },
+            //         { title: "Done", id: 3 },
+            //     ];
+            //     setCols(defaultCols);
+            // }
+        });
+
+        get(taskRef).then((snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("Task data:", data);
+                setTasks(data);
+                setCheckTasks(data);
+            }
+            // else {
+            //     console.log("No tasks found, setting to empty.");
+            //     setTasks([]);
+            // }
+        });
+
+        onValue(colRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("Column data (real-time):", data);
+                setCols(data);
+                setCheckCols(data);
+            }
+        });
+
+        onValue(taskRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("Task data (real-time):", data);
+                setTasks(data);
+                setCheckTasks(data);
+            }
+        });
+
+    }, [userEmail]);
+
+    useEffect(() => {
+        if (cols.length === 0) {
+            return;
+        } else if (checkCols !== cols || checkTasks !== tasks) {
+            if (!getData) {
+                setGetdata(true);
+            } else {
+                addDataToDb(cols, tasks, userEmail as string);
+                console.log("Data added to Realtime Database", cols, tasks);
+            }
+        }
     }, [tasks, cols]);
-
-    // useEffect(() => {
-    //     if (cols.length == 0) return;
-
-    //     if (checkCols == cols && checkTasks == tasks) return;
-
-    //     if (!checkCols) return;
-    //     const unsub = setInterval(() => {
-    //         addDataToDb(cols, tasks, userEmail as string)
-    //         console.log('data added')
-    //     }, 1000);
-
-    //     return () => clearInterval(unsub);
-    // });
 
 
     const sensors = useSensors(
@@ -230,17 +253,29 @@ function Board({ userEmail }: { userEmail: string | null }) {
         const tasksInThisCol = tasks.filter((task) => task.colId === colId);
 
         const id = Math.floor(Math.random() * 10000000);
-        setTasks([...tasks, { id, colId, text: `Task ${tasksInThisCol.length + 1}`, desc: '', comments: [] }]);
+        setTasks([...tasks, { id, colId, text: `Task ${tasksInThisCol.length + 1}`, desc: '', comments: [{ commentId: 123, commentText: '' }] }]);
     }
 
     const deleteTask = (taskId: number) => {
-        setTasks(tasks.filter((task) => task.id !== taskId));
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setTasks(tasks.filter((task) => task.id !== taskId));
 
-        const notify = () => toast.success('Task Deleted!', {
-            duration: 1000,
-            position: 'top-right',
+                const notify = () => toast.success('Task Deleted!', {
+                    duration: 1000,
+                    position: 'top-right',
+                });
+                notify();
+            }
         });
-        notify();
     };
 
     const deleteAllItems = (colId: number) => {
@@ -342,7 +377,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
         if (!input) return;
 
-        setTasks([...tasks, { id: Math.floor(Math.random() * 10000000), colId: parseInt(selected), text: input, desc: '', comments: [] }]);
+        setTasks([...tasks, { id: Math.floor(Math.random() * 10000000), colId: parseInt(selected), text: input, desc: '', comments: [{ commentId: 123, commentText: '' }] }]);
         setInput('');
     }
 
@@ -485,17 +520,17 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
     return (
         <div className='overflow-y-hidden h-screen w-full bg-zinc-900 relative'>
-            {showModal && <Modal handleDelDesc={handleDelDesc} handleAddDesc={handleAddDesc} handleDelComment={handleDelComment} handleAddComment={handleAddComment} userEmail={userEmail as string} setShowModal={setShowModal} modalDetails={modalDetails} />}
+            {showModal && <Modal handleDelDesc={handleDelDesc} handleAddDesc={handleAddDesc} handleDelComment={handleDelComment} handleAddComment={handleAddComment} userEmail={userEmail as string} setShowModal={setShowModal} modalDetails={modalDetails} tasks={tasks} />}
 
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
                     <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 max-md:hidden' onClick={() => setOpenProfile((prev) => !prev)}>
-                        {openProfile ? (<IoMdArrowDropup className='text-2xl' />) : (<IoMdArrowDropdown className='text-2xl' />)} Profile
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 hidden' onClick={() => setOpenProfile((prev) => !prev)}>
+                        {openProfile ? (<><IoMdArrowDropup className='text-2xl' /><p>Profile</p></>) : (<><IoMdArrowDropdown className='text-2xl' /><p>Profile</p></>)}
                     </button>
 
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800 md:hidden' onClick={() => setOpenProfile(!openProfile)}>
+                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800' onClick={() => setOpenProfile(!openProfile)}>
                         <FaUserCog className='text-3xl' />
                     </button>
 
