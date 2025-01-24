@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import Task from './Task';
 import toast, { Toaster } from 'react-hot-toast';
 import { BiPlus } from 'react-icons/bi';
-import { handleSignout } from '@/lib/firebase';
+import { handleResetPassword, handleSignout } from '@/lib/firebase';
 import { IoMdArrowDropdown, IoMdArrowDropup } from 'react-icons/io';
 import { CiLogout } from 'react-icons/ci';
 import { MdEmail } from 'react-icons/md';
@@ -35,6 +35,8 @@ interface Task {
 
 
 function Board({ userEmail }: { userEmail: string | null }) {
+    handleResetPassword(userEmail as string);
+
     const [showModal, setShowModal] = useState<boolean>(false);
 
     const [cols, setCols] = useState<Column[]>([]);

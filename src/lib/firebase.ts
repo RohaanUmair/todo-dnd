@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "firebase/auth";
 import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
 
@@ -117,6 +117,20 @@ function handleSignout() {
 
 
 
+function handleResetPassword(email: string) {
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            // Password reset email sent!
+            console.log('reset email sent')
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+        });
+}
+
+
+
 export {
     createAccount,
     loginUser,
@@ -128,5 +142,6 @@ export {
     getDoc,
     handleSignout,
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    handleResetPassword
 }
