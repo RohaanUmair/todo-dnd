@@ -27,7 +27,7 @@ export default function Home() {
     return (
       <div className="h-screen w-screen overflow-hidden bg-zinc-900 relative">
         <div className='flex bg-zinc-900 items-center pt-8 justify-center px-[10%] mx-auto relative'>
-          <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
+          <h1 data-testid='cypress-title' className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
         </div>
         <ClipLoader color="#fff" size={50} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-3/4" speedMultiplier={2} />
       </div>

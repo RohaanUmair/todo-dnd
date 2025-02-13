@@ -1,3 +1,4 @@
+
 'use client';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -158,11 +159,11 @@ function AuthPage() {
                         {({ resetForm, isSubmitting }) => (
                             <div className='h-4/5 w-full text-white flex justify-center items-center bg-zinc-900'>
                                 <Form className="bg-zinc-900 w-96 h-fit rounded-lg flex flex-col items-center gap-4 py-4 shadow shadow-black border border-green-500">
-                                    <h1 className="text-center text-4xl font-semibold px-12">Login</h1>
+                                    <h1 className="text-center text-4xl font-semibold px-12" id='login-text'>Login</h1>
 
                                     <div className="w-full flex flex-col px-12 gap-1">
                                         <label htmlFor='loginEmail' className="text-lg">Email</label>
-                                        <Field name="loginEmail" type="email" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                        <Field id='loginEmail' name="loginEmail" type="email" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
                                         <div className="text-red-700 text-sm my-1">
                                             <ErrorMessage name="loginEmail" />
                                         </div>
@@ -170,7 +171,7 @@ function AuthPage() {
 
                                     <div className="w-full flex flex-col px-12 gap-1">
                                         <label htmlFor='loginPassword' className="text-lg">Password</label>
-                                        <Field name="loginPassword" type="password" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
+                                        <Field id='loginPass' name="loginPassword" type="password" className="h-[38px] bg-zinc-600 outline-none px-4 rounded focus:ring-1 focus:ring-blue-600" />
                                         <div className="text-red-700 text-sm my-1">
                                             <ErrorMessage name="loginPassword" />
                                         </div>
@@ -179,12 +180,12 @@ function AuthPage() {
                                     {
                                         !isModalOpen && (
                                             <div className="w-full flex flex-col px-12 -translate-y-3">
-                                                <p className='cursor-pointer text-sm text-blue-500 text-left w-full' onClick={() => { handleOpenModal() }}>Forgot Password?</p>
+                                                <p id='forgotPass' className='cursor-pointer text-sm text-blue-500 text-left w-full' onClick={() => { handleOpenModal() }}>Forgot Password?</p>
                                             </div>
                                         )
                                     }
 
-                                    <button className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600' type="submit">
+                                    <button id='loginBtn' className='bg-zinc-800 w-32 h-12 text-lg rounded hover:bg-zinc-900 border border-zinc-900 hover:border-green-600' type="submit">
                                         {isSubmitting ? (
                                             <SyncLoader className='mx-auto' size={10} color='#fff' />
                                         ) : (
@@ -192,7 +193,7 @@ function AuthPage() {
                                         )}
                                     </button>
 
-                                    <p className='text-sm'>Dont have an account?
+                                    <p id='createAcc' className='text-sm'>Dont have an account?
                                         <span className='text-blue-500 cursor-pointer' onClick={() => switchForm('signup', resetForm)}>  Create Account</span>
                                     </p>
                                 </Form>
