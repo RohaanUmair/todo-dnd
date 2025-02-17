@@ -443,16 +443,58 @@ describe('All tests', () => {
         cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
             .click()
 
+        cy.wait(500)
+        cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.get('#column-1 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-1 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-1 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-1 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-1 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.get('#column-2 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-2 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-2 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(500)
+        cy.get('#column-2 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
         cy.wait(1000)
-        cy.get('#column-0 #edit-btn')
+        cy.get('#column-0 #task-1 #edit-btn')
             .click()
         cy.wait(1000)
 
-        cy.get('#column-0 #edit-task-inp')
+        cy.get('#column-0 #task-1 #edit-task-inp')
             .clear()
             .type('Edited Task')
 
-        cy.get('#column-0 #edit-task-save-btn')
+        cy.get('#column-0 #task-1 #edit-task-save-btn')
             .click()
 
 
@@ -493,6 +535,17 @@ describe('All tests', () => {
         cy.get('#add-task-btn')
             .click()
 
+        cy.wait(1000)
+        cy.get('#add-task-inp')
+            .type('Second task')
+
+        cy.get('#select-inp')
+            .select('Test Card')
+
+        cy.wait(1000)
+        cy.get('#add-task-btn')
+            .click()
+
 
         cy.wait(1000)
         cy.get('#column-3 #open-card-menu-btn')
@@ -510,6 +563,18 @@ describe('All tests', () => {
 
 
         cy.wait(1000)
+        cy.get('#add-task-inp')
+            .type('3rd test task')
+
+        cy.get('#select-inp')
+            .select('Test Card')
+
+        cy.wait(1000)
+        cy.get('#add-task-btn')
+            .click()
+
+
+        cy.wait(1000)
         cy.get('#column-3 #open-card-menu-btn')
             .click()
         cy.get('#column-3 #del-card-btn')
@@ -518,7 +583,20 @@ describe('All tests', () => {
 
 
         cy.wait(1000)
-        cy.get('#task-0').click()
+        cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(1000)
+        cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+        cy.wait(1000)
+        cy.get('#column-0 > .w-60 > .rounded > .mt-4 > .mx-auto')
+            .click()
+
+
+        cy.wait(1000)
+        cy.get('#column-0 task-0').click()
 
         cy.wait(1000)
         cy.get('#watch-btn').click()
@@ -555,6 +633,29 @@ describe('All tests', () => {
         cy.wait(1000)
 
         cy.get('.swal2-confirm')
+            .click()
+        cy.wait(1000)
+
+
+        cy.wait(1000)
+        cy.get('#column-0 #open-card-menu-btn')
+            .click()
+
+        cy.get('#column-0 #del-all-tasks-btn')
+            .click()
+
+        cy.wait(1000)
+        cy.get('#column-1 #open-card-menu-btn')
+            .click()
+
+        cy.get('#column-1 #del-all-tasks-btn')
+            .click()
+
+        cy.wait(1000)
+        cy.get('#column-2 #open-card-menu-btn')
+            .click()
+
+        cy.get('#column-2 #del-all-tasks-btn')
             .click()
         cy.wait(1000)
     })
