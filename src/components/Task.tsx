@@ -96,6 +96,7 @@ function Task(props: any) {
                     }}
                 >
                     <input
+                        id='edit-task-inp'
                         ref={inputRef}
                         type="text"
                         placeholder='Task'
@@ -105,7 +106,7 @@ function Task(props: any) {
                         autoFocus
                     />
 
-                    <div className="flex gap-1 cursor-default" ref={btnRef}>
+                    <div id='edit-task-save-btn' className="flex gap-1 cursor-default" ref={btnRef}>
                         <div className="h-6 w-6 shadow bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer" onClick={ () => handleEditDone() }>
                             <TiTick />
                         </div>
@@ -142,6 +143,7 @@ function Task(props: any) {
             style={style}
             {...attributes}
             {...listeners}
+            id='task'
             className="bg-zinc-800 border border-black shadow flex justify-between rounded py-2 px-4 cursor-grab items-center w-52 mx-auto my-2"
         >
             <>
@@ -167,6 +169,7 @@ function Task(props: any) {
 
                 <div className="flex gap-1 cursor-default">
                     <div
+                        id='edit-btn'
                         onClick={() =>
                             setEditMode(!editMode)
                         }
@@ -176,6 +179,7 @@ function Task(props: any) {
                     </div>
 
                     <div
+                        id='del-task-btn'
                         className="h-6 w-6 shadow text-red-500 text-lg rounded-full flex justify-center items-center cursor-pointer hover:scale-110 active:scale-95"
                         onClick={() => props.deleteTask(props.task.id)}
                     >

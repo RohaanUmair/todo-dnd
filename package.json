@@ -28,6 +28,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@4tw/cypress-drag-drop": "^2.3.0",
     "@eslint/eslintrc": "^3",
     "@types/bootbox": "^5.2.8",
     "@types/lodash": "^4.17.14",
@@ -35,6 +36,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cypress": "^14.0.3",
+    "cypress-real-events": "^1.14.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",

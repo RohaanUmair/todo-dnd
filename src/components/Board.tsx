@@ -526,12 +526,12 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
             <div className='fixed'>
                 <div className='flex items-center mt-8 justify-center w-[90%] mx-auto relative'>
-                    <h1 className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
+                    <h1 id='heading' className='text-center text-white text-4xl font-semibold max-md:text-2xl'>TASK MANAGEMENT</h1>
                     <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute justify-center right-0 gap-1 text-lg rounded-sm items-center max-md:scale-75 max-md:-right-8 font-normal hover:bg-blue-800 hidden' onClick={() => setOpenProfile((prev) => !prev)}>
                         {openProfile ? (<><IoMdArrowDropup className='text-2xl' /><p>Profile</p></>) : (<><IoMdArrowDropdown className='text-2xl' /><p>Profile</p></>)}
                     </button>
 
-                    <button ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800' onClick={() => setOpenProfile(!openProfile)}>
+                    <button id='profile-btn' ref={btnRef} className='bg-blue-900 h-10 w-28 text-white absolute flex justify-center right-0 gap-1 text-lg rounded-sm items-center       max-md:scale-75 max-md:w-10 max-md:h-10 max-md:-right-0 font-normal hover:bg-blue-800' onClick={() => setOpenProfile(!openProfile)}>
                         <FaUserCog className='text-3xl' />
                     </button>
 
@@ -540,7 +540,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                             <div ref={profileRef} className='text-white w-fit h-fit absolute right-0 top-10 bg-zinc-600 px-2 rounded-b rounded-l     max-md:right-0'>
                                 <div className='bg-zinc-800 px-2 flex items-center justify-center h-7 my-2 pl-10 text-sm rounded'><MdEmail className='absolute left-4 text-xl' /> {userEmail}</div>
 
-                                <div className='bg-zinc-800 px-2 flex items-center justify-center h-7 my-2 pl-10 text-sm rounded hover:bg-zinc-700 cursor-pointer' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
+                                <div className='bg-zinc-800 px-2 flex items-center justify-center h-7 my-2 pl-10 text-sm rounded hover:bg-zinc-700 cursor-pointer' id='logout-btn' onClick={handleSignout}><CiLogout className='absolute left-4 text-xl' /> Logout</div>
                             </div>
                         )
                     }
@@ -561,6 +561,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
 
                         ) : (
                             <input
+                                id='add-task-inp'
                                 className="outline-none py-3 w-96 min-w-4 rounded px-5 bg-zinc-800 text-zinc-200    max-md:w-24"
                                 placeholder="Type Something..."
                                 type="text"
@@ -571,7 +572,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                     }
 
                     <div className='flex items-center'>
-                        <select onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded-l pl-2 bg-zinc-800 text-white text-sm" >
+                        <select id='select-inp' onChange={(e) => setSelected(e.target.value)} className="w-24 outline-none h-12 rounded-l pl-2 bg-zinc-800 text-white text-sm" >
                             {
                                 cols.map((col, index) => {
                                     return <option className='!w-24' key={index} value={col.id}>{
@@ -584,7 +585,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                         <div className='w-2 h-12 bg-zinc-800 rounded-r'></div>
                     </div>
 
-                    <button type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition      max-md:w-12"> <BiPlus className='text-xl' /> </button>
+                    <button id='add-task-btn' type="submit" className="h-12 w-24 rounded text-white font-semibold bg-zinc-800 flex justify-center items-center gap-1 hover:bg-zinc-700 active:bg-zinc-800 transition      max-md:w-12"> <BiPlus className='text-xl' /> </button>
                 </form>
             </div>
 
@@ -604,8 +605,8 @@ function Board({ userEmail }: { userEmail: string | null }) {
                         ) : (
                             <>
                                 <SortableContext items={cols.map((col) => col.id)} >
-                                    {cols.map((col) => (
-                                        <div key={col.id}>
+                                    {cols.map((col, i: number) => (
+                                        <div id={`column-${i}`} key={col.id}>
                                             <ColumnContainer handleModal={handleModal} updateTask={updateTask} editTask={editTask} editColTitle={editColTitle} deleteCol={deleteCol} deleteAllItems={deleteAllItems} deleteTask={deleteTask} col={col} addNewTask={addNewTask} tasks={tasks.filter((task) => task.colId == col.id)} />
                                         </div>
                                     ))}
@@ -621,7 +622,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                                     setShowForm(!showForm);
                                                     setHeading('');
                                                 }}>
-                                                <input ref={inputColRef} type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus
+                                                <input id='add-card-inp' ref={inputColRef} type="text" placeholder="Heading" className="border-b border-black py-3 rounded-t outline-none px-5 w-52 bg-zinc-800 text-white" autoFocus
                                                     onChange={(e) => setHeading(e.target.value)} />
 
                                                 <button ref={addColBtnRef} onClick={() => {
@@ -629,6 +630,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                                     setHeading('');
                                                     setShowForm(!showForm);
                                                 }}
+                                                    id='add-card-btn'
                                                     className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 ${showForm ? 'rounded-b' : 'rounded'}`}
                                                 >
                                                     {
@@ -641,6 +643,7 @@ function Board({ userEmail }: { userEmail: string | null }) {
                                                 handleNewCol();
                                                 setShowForm(!showForm);
                                             }}
+                                                id='new-card-btn'
                                                 className={`bg-zinc-800 text-white py-3 shadow outline-none cursor-pointer hover:bg-zinc-700 transition rounded-b px-8 w-52 mr-12 ${showForm ? 'rounded-b' : 'rounded'}`}
                                             >
                                                 {

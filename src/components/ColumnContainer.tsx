@@ -143,6 +143,7 @@ function ColumnContainer(props: any) {
                             isEditingTitle ? (
                                 <form onSubmit={handleEditColTitle} className='flex items-center'>
                                     <input
+                                        id='edit-card-title-inp'
                                         ref={inputRef}
                                         type="text"
                                         placeholder="Column Title"
@@ -153,6 +154,7 @@ function ColumnContainer(props: any) {
                                     />
 
                                     <div
+                                        id='edit-card-title-save-btn'
                                         ref={btnRef}
                                         onClick={handleEditColTitle}
                                         className="h-6 w-6 bg-green-500 text-white rounded-full flex justify-center items-center hover:scale-105 active:scale-95 cursor-pointer"
@@ -174,7 +176,7 @@ function ColumnContainer(props: any) {
                                 )
                             )
                         }
-                        <div className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
+                        <div id='open-card-menu-btn' className={`w-5 h-5 rounded-sm flex justify-center items-center cursor-pointer ${openMenu ? 'bg-zinc-700' : ''}`} onBlur={() => setOpenMenu(false)} onClick={() => setOpenMenu(!openMenu)}>
                             {
                                 openMenu ? (
                                     <div ref={menuRef}>
@@ -182,6 +184,7 @@ function ColumnContainer(props: any) {
                                         <div className="relative">
                                             <ul className="absolute !w-36 top-4 text-sm right-0 bg-zinc-900 border rounded text-white p-2">
                                                 <li
+                                                    id='edit-card-title-btn'
                                                     className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b"
                                                     onClick={() => setIsEditingTitle(true)}
                                                 >
@@ -199,6 +202,7 @@ function ColumnContainer(props: any) {
                                                         <li
                                                             className={`cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1 border-b`}
                                                             onClick={() => props.deleteAllItems(props.col.id)}
+                                                            id='del-all-tasks-btn'
                                                         >
                                                             Delete All <MdDeleteSweep className="text-xl text-red-600" />
                                                         </li>
@@ -210,6 +214,7 @@ function ColumnContainer(props: any) {
                                                         <></>
                                                     ) : (
                                                         <li
+                                                            id='del-card-btn'
                                                             className="cursor-pointer hover:bg-zinc-700 active:bg-gray-400 w-full h-12 flex items-center px-2 rounded justify-between py-1"
                                                             onClick={() => props.deleteCol(props.col.title)}
                                                         >
@@ -232,10 +237,13 @@ function ColumnContainer(props: any) {
                         <SortableContext items={props.tasks.map((task: any) => task.id)}>
                             {props.tasks.length > 0 ? (
                                 props.tasks.map((task: any, index: number) => (
-                                    <Task handleModal={props.handleModal} updateTask={props.updateTask} editTask={props.editTask} key={index} task={task} deleteTask={props.deleteTask} />
+                                    <div key={index} id={`task-${index}`}>
+                                        <Task handleModal={props.handleModal} updateTask={props.updateTask} editTask={props.editTask} task={task} deleteTask={props.deleteTask} />
+                                    </div>
                                 ))
                             ) : (
                                 <div
+                                    id='drop-zone'
                                     className="h-full flex items-center justify-center text-gray-500 italic text-sm px-6 py-2"
                                 >
                                     Drag a task here or create a new one
@@ -248,6 +256,7 @@ function ColumnContainer(props: any) {
                         <div
                             onClick={() => props.addNewTask(props.col.id)}
                             className="w-full mx-auto h-10 border-2 border-black bg-black rounded-b flex items-center px-4 hover:bg-zinc-950 text-zinc-500 cursor-pointer hover:justify-center transition-all hover:text-[17px] hover:text-black "
+                            id='add-task-btn-card'
                         >
                             <h1 className=" font-bold flex items-center justify-between w-full">
                                 <span className="flex items-center gap-2 text-zinc-500">Add <MdAddCircleOutline /></span>

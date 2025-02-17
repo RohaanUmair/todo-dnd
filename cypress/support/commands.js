@@ -1,4 +1,28 @@
 /// <reference types="cypress" />
+
+import '@4tw/cypress-drag-drop'
+
+
+Cypress.Commands.add("dragTo", { prevSubject: "element" }, (subject, targetEl) => {
+    const dataTransfer = new DataTransfer();
+    cy.get(subject).trigger('dragstart', {
+        dataTransfer
+    });
+    cy.get(targetEl).trigger('drop', {
+        dataTransfer
+    })
+}
+);
+
+Cypress.Commands.add('dragAndDropDndKit', (dragSelector, dropSelector) => {
+    cy.get(dragSelector)
+        .trigger('pointerdown', { buttons: 1 }) // Simulate mouse click
+        .trigger('pointermove', { clientX: 200, clientY: 200 }) // Move to the target area
+        .wait(100) // Small delay for stability
+        .get(dropSelector)
+        .trigger('pointerup', { force: true }); // Drop the item
+});
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -14,7 +38,7 @@
 // Cypress.Commands.add('login', (email, password) => { ... })
 //
 //
-// -- This is a child command --
+// -- This is a child command --    
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
 //
 //
